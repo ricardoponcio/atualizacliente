@@ -26,8 +26,8 @@ public class WebSecurityConfig {
     private AuthEntryPointJwt unauthorizedHandler;
 
     @Bean
-    public JWTAuthorizationFilter authenticationJwtTokenFilter() {
-        return new JWTAuthorizationFilter();
+    public AbstractJWTFilter authenticationJwtTokenFilter() {
+        return new JWTCookieFilter();
     }
 
     @Bean
