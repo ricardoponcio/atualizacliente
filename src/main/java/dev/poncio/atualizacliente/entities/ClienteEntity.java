@@ -30,10 +30,8 @@ public class ClienteEntity {
     private LocalDateTime criadoEm;
     @Column(name = "validado_em")
     private LocalDateTime validadoEm;
-    @Column(name = "criado_por_id")
-    private Long criadoPorId;
     @ManyToOne
-    @JoinColumn(name = "criado_por_id", insertable = false, updatable = false)
+    @JoinColumn(name = "criado_por_id")
     private UsuarioEntity criadoPor;
 
 }

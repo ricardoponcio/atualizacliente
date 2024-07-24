@@ -3,7 +3,6 @@ package dev.poncio.atualizacliente.controller;
 import dev.poncio.atualizacliente.dto.AtualizarClienteRequestDTO;
 import dev.poncio.atualizacliente.dto.ClienteDTO;
 import dev.poncio.atualizacliente.dto.CriarClienteRequestDTO;
-import dev.poncio.atualizacliente.entities.ClienteEntity;
 import dev.poncio.atualizacliente.services.ClienteService;
 import dev.poncio.atualizacliente.utils.ClienteMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,14 +29,12 @@ public class ClientesController {
 
     @PutMapping("/criar")
     public ClienteDTO criarCliente(@RequestBody CriarClienteRequestDTO criarClienteRequestDTO) {
-        ClienteEntity novoCliente = this.clienteService.inserirCliente(clienteMapper.map(criarClienteRequestDTO));
-        return clienteMapper.map(novoCliente);
+        return clienteMapper.map(this.clienteService.inserirCliente(criarClienteRequestDTO));
     }
 
     @PatchMapping("/atualizar/{id}")
     public ClienteDTO atualizarCliente(@PathVariable Long id, @RequestBody AtualizarClienteRequestDTO atualizarClienteRequestDTO) {
-        ClienteEntity clienteAtualizado = this.clienteService.atualizarCliente(id, clienteMapper.map(atualizarClienteRequestDTO));
-        return clienteMapper.map(clienteAtualizado);
+        return clienteMapper.map(this.clienteService.atualizarCliente(id, atualizarClienteRequestDTO));
     }
 
     @DeleteMapping("/remover/{id}")

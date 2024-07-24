@@ -1,13 +1,19 @@
 package dev.poncio.atualizacliente.entities;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "projeto_atualizacao")
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class ProjetoAtualizacaoEntity {
 
     @Id
@@ -26,16 +32,14 @@ public class ProjetoAtualizacaoEntity {
     private ProjetoEntity.ProjetoSubStatus subStatus;
     @Column(name = "criado_em")
     private LocalDateTime criadoEm;
-    @Column(name = "criado_por_id")
-    private Long criadoPorId;
     @ManyToOne
-    @JoinColumn(name = "criado_por_id", insertable = false, updatable = false)
+    @JoinColumn(name = "criado_por_id")
     private UsuarioEntity criadoPor;
-    @Column(name = "projeto_id")
-    private Long projetoId;
     @ManyToOne
-    @JoinColumn(name = "projeto_id", insertable = false, updatable = false)
+    @JoinColumn(name = "projeto_id")
     private ProjetoEntity projeto;
+    @OneToOne(mappedBy = "projetoAtualizacao", cascade = CascadeType.REMOVE)
+    private ProjetoAtualizacaoEmailEntity email;
 
 
 }

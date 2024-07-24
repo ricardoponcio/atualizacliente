@@ -13,6 +13,5 @@ public class CriarClienteRequestDTO {
     private String nomeFantasia;
     private String cnpj;
     private String email;
-    private Long criadoPorId;
 
 }

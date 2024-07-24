@@ -1,8 +1,10 @@
 package dev.poncio.atualizacliente.entities;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
@@ -10,6 +12,8 @@ import java.time.LocalDateTime;
 @Table(name = "projeto_atualizacao_email")
 @Data
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class ProjetoAtualizacaoEmailEntity {
 
     public static enum ProjetoAtualizacaoEmailResultado {
@@ -41,8 +45,8 @@ public class ProjetoAtualizacaoEmailEntity {
     private String assunto;
     @Column
     private String corpo;
-    @Column(name = "email_solicitado_em")
-    private LocalDateTime emailSolicitadoEm;
+    @Column(name = "envio_solicitado_em")
+    private LocalDateTime envioSolicitadoEm;
     @Column(name = "envio_processado_em")
     private LocalDateTime envioProcessadoEm;
     @Column
@@ -50,11 +54,8 @@ public class ProjetoAtualizacaoEmailEntity {
     private ProjetoAtualizacaoEmailResultado resultado;
     @Column(name = "mensagem_erro")
     private String mensagemErro;
-    @Column(name = "projeto_atualizacao_id")
-    private Long projetoAtualizacaoId;
-    @ManyToOne
-    @JoinColumn(name = "projeto_atualizacao_id", insertable = false, updatable = false)
+    @OneToOne
+    @JoinColumn(name = "projeto_atualizacao_id")
     private ProjetoAtualizacaoEntity projetoAtualizacao;
-
 
 }

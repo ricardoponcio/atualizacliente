@@ -1,11 +1,11 @@
 package dev.poncio.atualizacliente.services;
 
-import dev.poncio.atualizacliente.entities.ProjetoAtualizacaoEmailEntity;
-import dev.poncio.atualizacliente.entities.ProjetoAtualizacaoEntity;
+import dev.poncio.atualizacliente.dto.AtualizaProjetoRequestDTO;
+import dev.poncio.atualizacliente.dto.CriarProjetoRequestDTO;
 import dev.poncio.atualizacliente.entities.ProjetoEntity;
-import dev.poncio.atualizacliente.repositories.IProjetoAtualizacaoEmailRepository;
-import dev.poncio.atualizacliente.repositories.IProjetoAtualizacaoRepository;
 import dev.poncio.atualizacliente.repositories.IProjetoRepository;
+import dev.poncio.atualizacliente.utils.AuthContext;
+import dev.poncio.atualizacliente.utils.ProjetoMapper;
 import jakarta.persistence.EntityNotFoundException;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,33 +19,48 @@ import java.util.List;
 public class ProjetoService {
 
     @Autowired
+    private IProjetoRepository projetoRepository;
+    @Autowired
     @Qualifier("partialUpdateMapper")
     private ModelMapper partialUpdateMapper;
     @Autowired
-    private IProjetoRepository projetoRepository;
+    private ProjetoMapper projetoMapper;
     @Autowired
-    private IProjetoAtualizacaoRepository projetoAtualizacaoRepository;
+    private AuthContext authContext;
     @Autowired
-    private IProjetoAtualizacaoEmailRepository projetoAtualizacaoEmailRepository;
+    private ProjetoAtualizacaoService projetoAtualizacaoService;
+    @Autowired
+    private ClienteService clienteService;
+
+    public ProjetoEntity buscarPeloId(Long id) {
+        return this.projetoRepository.findById(id).orElseThrow(EntityNotFoundException::new);
+    }
 
     public List<ProjetoEntity> listarProjetos() {
         return this.projetoRepository.findAll();
     }
 
-    public ProjetoEntity inserirProjeto(ProjetoEntity projeto) {
-        projeto.setStatus(ProjetoEntity.ProjetoStatus.A);
-        projeto.setSubStatus(ProjetoEntity.ProjetoSubStatus.F);
-        projeto.setCriadoEm(LocalDateTime.now());
-        return this.projetoRepository.save(projeto);
+    public ProjetoEntity inserirProjeto(CriarProjetoRequestDTO criarProjetoRequestDTO) {
+        ProjetoEntity novoProjeto = projetoMapper.map(criarProjetoRequestDTO);
+        novoProjeto.setStatus(ProjetoEntity.ProjetoStatus.A);
+        novoProjeto.setSubStatus(ProjetoEntity.ProjetoSubStatus.F);
+        novoProjeto.setCriadoEm(LocalDateTime.now());
+        novoProjeto.setCriadoPor(authContext.getUsuarioLogado());
+        novoProjeto.setCliente(clienteService.buscarPeloId(criarProjetoRequestDTO.getClienteId()));
+        return this.projetoRepository.save(novoProjeto);
     }
 
-    public ProjetoEntity atualizarProjeto(Long id, ProjetoEntity projeto) {
+    public ProjetoEntity atualizarProjeto(Long id, AtualizaProjetoRequestDTO atualizaProjetoRequestDTO) {
         ProjetoEntity projetoSalvo = this.projetoRepository.findById(id).orElse(null);
         if (projetoSalvo == null)
             throw new EntityNotFoundException();
 
-        partialUpdateMapper.map(projeto, projetoSalvo);
-        return this.projetoRepository.save(projetoSalvo);
+        ProjetoEntity projetoAlteracoes = this.projetoMapper.map(atualizaProjetoRequestDTO);
+        partialUpdateMapper.map(projetoAlteracoes, projetoSalvo);
+        ProjetoEntity projetoAlterado = this.projetoRepository.save(projetoSalvo);
+
+        this.projetoAtualizacaoService.inserirAtualizacao(projetoAlterado, authContext.getUsuarioLogado());
+        return projetoAlterado;
     }
 
     public void removerProjeto(Long id) {
@@ -53,22 +68,6 @@ public class ProjetoService {
             throw new EntityNotFoundException();
 
         this.projetoRepository.deleteById(id);
-    }
-
-    public ProjetoAtualizacaoEntity inserirAtalizacao(ProjetoAtualizacaoEntity projetoAtualizacao) {
-        ProjetoAtualizacaoEntity projetoAtualizacaoCriado = this.projetoAtualizacaoRepository.save(projetoAtualizacao);
-        registraIntencaoEmail(
-                ProjetoAtualizacaoEmailEntity.builder()
-                        .assunto("Atualização do Projeto")
-                        .corpo("Cheque na plataforma")
-                        .emailSolicitadoEm(LocalDateTime.now())
-                        .emailDestino(projetoAtualizacao.getProjeto().getCliente().getEmail())
-                        .build());
-        return projetoAtualizacaoCriado;
-    }
-
-    private ProjetoAtualizacaoEmailEntity registraIntencaoEmail(ProjetoAtualizacaoEmailEntity projetoAtualizacaoEmail) {
-        return this.projetoAtualizacaoEmailRepository.save(projetoAtualizacaoEmail);
     }
 
 }

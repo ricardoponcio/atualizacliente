@@ -15,7 +15,6 @@ public class CriarProjetoRequestDTO {
     private String descricao;
     private Double valor;
     private LocalDateTime dataLimite;
-    private Long criadoPorId;
     private Long clienteId;
 
 }

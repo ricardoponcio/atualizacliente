@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "projeto")
@@ -68,16 +69,14 @@ public class ProjetoEntity {
     private ProjetoSubStatus subStatus;
     @Column(name = "criado_em")
     private LocalDateTime criadoEm;
-    @Column(name = "criado_por_id")
-    private Long criadoPorId;
     @ManyToOne
-    @JoinColumn(name = "criado_por_id", insertable = false, updatable = false)
+    @JoinColumn(name = "criado_por_id")
     private UsuarioEntity criadoPor;
-    @Column(name = "cliente_id")
-    private Long clienteId;
     @ManyToOne
-    @JoinColumn(name = "cliente_id", insertable = false, updatable = false)
+    @JoinColumn(name = "cliente_id")
     private ClienteEntity cliente;
+    @OneToMany(mappedBy = "projeto", cascade = CascadeType.REMOVE)
+    private List<ProjetoAtualizacaoEntity> projetoAtualizacoes;
 
 
 }
