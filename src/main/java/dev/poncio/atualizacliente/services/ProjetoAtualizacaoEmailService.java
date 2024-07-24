@@ -15,10 +15,11 @@ public class ProjetoAtualizacaoEmailService {
     private IProjetoAtualizacaoEmailRepository projetoAtualizacaoEmailRepository;
 
     public ProjetoAtualizacaoEmailEntity registraIntencaoEmail(ProjetoAtualizacaoEntity projetoAtualizacao) {
+        String link = String.format("http://localhost:8080/projetos/listar/%s/atualizacoes/token", projetoAtualizacao.getTokenView());
         return this.registraIntencaoEmail(
                 ProjetoAtualizacaoEmailEntity.builder()
                         .assunto("Atualização do Projeto")
-                        .corpo("Cheque na plataforma")
+                        .corpo(String.format("Cheque na plataforma: %s", link))
                         .envioSolicitadoEm(LocalDateTime.now())
                         .emailDestino(projetoAtualizacao.getProjeto().getCliente().getEmail())
                         .projetoAtualizacao(projetoAtualizacao)

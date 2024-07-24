@@ -1,9 +1,11 @@
 package dev.poncio.atualizacliente.services;
 
 import dev.poncio.atualizacliente.configuration.CustomUserDetails;
+import dev.poncio.atualizacliente.dto.CriaUsuarioRequestDTO;
 import dev.poncio.atualizacliente.entities.UsuarioEntity;
 import dev.poncio.atualizacliente.repositories.IUsuarioRepository;
 import dev.poncio.atualizacliente.utils.AuthContext;
+import dev.poncio.atualizacliente.utils.UsuarioMapper;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -22,6 +24,8 @@ public class UsuarioService implements UserDetailsService {
     private Boolean permiteCadastro;
     @Autowired
     private IUsuarioRepository usuarioRepository;
+    @Autowired
+    private UsuarioMapper usuarioMapper;
     @Autowired
     @Qualifier("partialUpdateMapper")
     private ModelMapper partialUpdateMapper;
@@ -42,14 +46,18 @@ public class UsuarioService implements UserDetailsService {
         return this.usuarioRepository.findUsuarioEntityByEmailAndAtivoTrueAndValidadoTrue(email).orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado"));
     }
 
-    public UsuarioEntity cadastraUsuario(UsuarioEntity usuario) throws Exception {
-        if (permiteCadastro == null || !permiteCadastro.booleanValue())
+    public UsuarioEntity cadastraUsuario(CriaUsuarioRequestDTO criaUsuarioRequestDTO) throws Exception {
+        boolean isCadastroPermitido = permiteCadastro != null && permiteCadastro;
+        if (possuiAlgumUsuarioCadastrado() && !isCadastroPermitido)
             throw new Exception("Não é possível realizar novos cadastros");
-        usuario.setValidado(false);
-        usuario.setAtivo(true);
-        usuario.setCriadoEm(LocalDateTime.now());
-        usuario.setCriadoPor(authContext.getUsuarioLogado());
-        return this.usuarioRepository.save(usuario);
+        if (buscarUsuarioPorEmail(criaUsuarioRequestDTO.getEmail()) != null)
+            throw new Exception("Email já cadastrado");
+        UsuarioEntity usuarioNovo = this.usuarioMapper.map(criaUsuarioRequestDTO);
+        usuarioNovo.setValidado(false);
+        usuarioNovo.setAtivo(true);
+        usuarioNovo.setCriadoEm(LocalDateTime.now());
+        usuarioNovo.setCriadoPor(authContext.getUsuarioLogado());
+        return this.usuarioRepository.save(usuarioNovo);
     }
 
 }

@@ -14,6 +14,6 @@ public class ProjetoAtualizacaoDTO {
     private String subStatus;
     private LocalDateTime criadoEm;
     private UsuarioBasicoDTO criadoPor;
-    private ProjetoAtualizacaoEmailSemProjetoAtualizacaoDTO email;
+    private ProjetoAtualizacaoEmailSimplificadoDTO email;
 
 }

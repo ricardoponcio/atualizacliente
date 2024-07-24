@@ -42,4 +42,9 @@ public class AuthController {
         return authMapper.map(userDetails.getUsuario(), jwt);
     }
 
+    @PostMapping("/logout")
+    public void logout() {
+        SecurityContextHolder.getContext().setAuthentication(null);
+    }
+
 }

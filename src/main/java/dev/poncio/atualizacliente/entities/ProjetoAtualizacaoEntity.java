@@ -32,6 +32,8 @@ public class ProjetoAtualizacaoEntity {
     private ProjetoEntity.ProjetoSubStatus subStatus;
     @Column(name = "criado_em")
     private LocalDateTime criadoEm;
+    @Column(name = "token_view")
+    private String tokenView;
     @ManyToOne
     @JoinColumn(name = "criado_por_id")
     private UsuarioEntity criadoPor;

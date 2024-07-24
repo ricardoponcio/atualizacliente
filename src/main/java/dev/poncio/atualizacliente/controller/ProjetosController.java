@@ -56,4 +56,9 @@ public class ProjetosController {
                 .stream().map(projetoAtualizacaoMapper::map).collect(Collectors.toList());
     }
 
+    @GetMapping("/listar/{token}/atualizacoes/token")
+    public ProjetoAtualizacaoDTO listarAtualizacoesProjeto(@PathVariable String token) {
+        return this.projetoAtualizacaoMapper.map(this.projetoAtualizacaoService.atualizacaoBuscaPorToken(token));
+    }
+
 }
