@@ -9,7 +9,12 @@ public class JWTAuthorizationFilter extends AbstractJWTFilter {
         String headerAuth = request.getHeader("Authorization");
 
         if (StringUtils.hasText(headerAuth) && headerAuth.startsWith("Bearer ")) {
-            return headerAuth.substring(7);
+            if (headerAuth.length() > 8) {
+                String bearerToken = headerAuth.substring(7);
+                if (!bearerToken.trim().isEmpty()) {
+                    return bearerToken;
+                }
+            }
         }
 
         return null;

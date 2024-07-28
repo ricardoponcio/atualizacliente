@@ -57,6 +57,7 @@ public class WebSecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/login").permitAll()
                         .requestMatchers("/usuario/cadastro").anonymous()
+                        .requestMatchers("/projetos/listar/*/atualizacoes/token").anonymous()
                         //.requestMatchers("/**").hasAuthority("ADMIN")
                         .anyRequest().authenticated()
                 );
