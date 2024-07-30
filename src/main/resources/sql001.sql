@@ -21,6 +21,8 @@ create table cliente (
 	cnpj varchar(14) not null,
 	email text not null,
 	validado boolean not null default false,
+	senha_visualizacao text null,
+	token_validacao text not null,
 	ativo boolean not null default true,
 	criado_em timestamp(6) not null default CURRENT_TIMESTAMP,
 	validado_em timestamp(6) null,
@@ -47,6 +49,7 @@ create table projeto (
 insert into projeto(nome, descricao, valor, data_limite, criado_por_id, cliente_id)
 values('Projeto 1', 'Projeto Desc', 100, '2024-11-30 23:59:59', 1, 1);
 
+--drop table projeto_atualizacao_email;
 --drop table projeto_atualizacao;
 create table projeto_atualizacao (
 	id serial primary key,

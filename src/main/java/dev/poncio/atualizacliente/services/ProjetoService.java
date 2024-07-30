@@ -2,7 +2,10 @@ package dev.poncio.atualizacliente.services;
 
 import dev.poncio.atualizacliente.dto.AtualizaProjetoRequestDTO;
 import dev.poncio.atualizacliente.dto.CriarProjetoRequestDTO;
+import dev.poncio.atualizacliente.entities.ClienteEntity;
+import dev.poncio.atualizacliente.entities.ProjetoAtualizacaoEntity;
 import dev.poncio.atualizacliente.entities.ProjetoEntity;
+import dev.poncio.atualizacliente.excecoes.RegraNegocioException;
 import dev.poncio.atualizacliente.repositories.IProjetoRepository;
 import dev.poncio.atualizacliente.utils.AuthContext;
 import dev.poncio.atualizacliente.utils.ProjetoMapper;
@@ -68,6 +71,22 @@ public class ProjetoService {
             throw new EntityNotFoundException();
 
         this.projetoRepository.deleteById(id);
+    }
+
+    public List<ProjetoAtualizacaoEntity> listarAtualizacoes(Long projetoId) {
+        return this.projetoAtualizacaoService.atualizacaoPorProjeto(projetoId);
+    }
+
+    public ProjetoAtualizacaoEntity retornarAtualizacaoPorToken(String senhaCliente, String token) throws RegraNegocioException {
+        ProjetoAtualizacaoEntity projetoAtualizacaoEntity = this.projetoAtualizacaoService.atualizacaoBuscaPorToken(token);
+        ClienteEntity cliente = projetoAtualizacaoEntity.getProjeto().getCliente();
+        if (!clienteService.clienteEstaValidado(cliente)) {
+            throw new RegraNegocioException("Cliente não está validado");
+        }
+        if (!clienteService.checarSenhaCliente(senhaCliente, cliente)) {
+            throw new RegraNegocioException("Senha do cliente é inválida");
+        }
+        return projetoAtualizacaoEntity;
     }
 
 }

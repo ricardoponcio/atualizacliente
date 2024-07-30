@@ -24,6 +24,10 @@ public class ClienteEntity {
     private String email;
     @Column
     private Boolean validado;
+    @Column(name = "senha_visualizacao")
+    private String senhaVisualizacao;
+    @Column(name = "token_validacao")
+    private String tokenValidacao;
     @Column
     private Boolean ativo;
     @Column(name = "criado_em")

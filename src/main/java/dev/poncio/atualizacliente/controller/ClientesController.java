@@ -3,6 +3,8 @@ package dev.poncio.atualizacliente.controller;
 import dev.poncio.atualizacliente.dto.AtualizarClienteRequestDTO;
 import dev.poncio.atualizacliente.dto.ClienteDTO;
 import dev.poncio.atualizacliente.dto.CriarClienteRequestDTO;
+import dev.poncio.atualizacliente.dto.ValidarClienteDTO;
+import dev.poncio.atualizacliente.excecoes.RegraNegocioException;
 import dev.poncio.atualizacliente.services.ClienteService;
 import dev.poncio.atualizacliente.utils.ClienteMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +37,11 @@ public class ClientesController {
     @PatchMapping("/atualizar/{id}")
     public ClienteDTO atualizarCliente(@PathVariable Long id, @RequestBody AtualizarClienteRequestDTO atualizarClienteRequestDTO) {
         return clienteMapper.map(this.clienteService.atualizarCliente(id, atualizarClienteRequestDTO));
+    }
+
+    @PostMapping("/validar/{token}")
+    public ClienteDTO validarCliente(@PathVariable String token, @RequestBody ValidarClienteDTO validarClienteDTO) throws RegraNegocioException {
+        return clienteMapper.map(this.clienteService.validarCliente(token, validarClienteDTO.getSenhaCliente()));
     }
 
     @DeleteMapping("/remover/{id}")

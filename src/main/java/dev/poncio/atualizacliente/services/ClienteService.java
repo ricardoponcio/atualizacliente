@@ -3,6 +3,7 @@ package dev.poncio.atualizacliente.services;
 import dev.poncio.atualizacliente.dto.AtualizarClienteRequestDTO;
 import dev.poncio.atualizacliente.dto.CriarClienteRequestDTO;
 import dev.poncio.atualizacliente.entities.ClienteEntity;
+import dev.poncio.atualizacliente.excecoes.RegraNegocioException;
 import dev.poncio.atualizacliente.repositories.IClienteRepository;
 import dev.poncio.atualizacliente.utils.AuthContext;
 import dev.poncio.atualizacliente.utils.ClienteMapper;
@@ -10,10 +11,13 @@ import jakarta.persistence.EntityNotFoundException;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class ClienteService {
@@ -27,9 +31,20 @@ public class ClienteService {
     private ModelMapper partialUpdateMapper;
     @Autowired
     private AuthContext authContext;
+    @Autowired
+    private BCryptPasswordEncoder passwordEncoder;
 
     public ClienteEntity buscarPeloId(Long id) {
         return this.clienteRepository.findById(id).orElseThrow(EntityNotFoundException::new);
+    }
+
+    public boolean clienteEstaValidado(ClienteEntity cliente) {
+        return this.clienteRepository.existsByIdAndValidadoTrue(cliente.getId());
+    }
+
+    public boolean checarSenhaCliente(String senha, ClienteEntity cliente) {
+        ClienteEntity clienteAtualizado = this.buscarPeloId(cliente.getId());
+        return this.passwordEncoder.matches(senha, clienteAtualizado.getSenhaVisualizacao());
     }
 
     public List<ClienteEntity> listarClientes() {
@@ -42,7 +57,22 @@ public class ClienteService {
         clienteNovo.setValidado(false);
         clienteNovo.setAtivo(true);
         clienteNovo.setCriadoPor(authContext.getUsuarioLogado());
+        clienteNovo.setTokenValidacao(UUID.randomUUID().toString());
         return this.clienteRepository.save(clienteNovo);
+    }
+
+    public ClienteEntity validarCliente(String tokenValidacao, String novaSenhaCliente) throws RegraNegocioException {
+        Optional<ClienteEntity> clienteSalvoResultado = this.clienteRepository.findByTokenValidacao(tokenValidacao);
+        if (clienteSalvoResultado.isEmpty()) {
+            throw new RegraNegocioException("Cliente não existe");
+        }
+        ClienteEntity clienteSalvo = clienteSalvoResultado.get();
+        if (clienteSalvo.getValidado() == Boolean.TRUE) {
+            throw new RegraNegocioException("Cliente já validado");
+        }
+        clienteSalvo.setSenhaVisualizacao(this.passwordEncoder.encode(novaSenhaCliente));
+        clienteSalvo.setValidado(Boolean.TRUE);
+        return this.clienteRepository.save(clienteSalvo);
     }
 
     public ClienteEntity atualizarCliente(Long id, AtualizarClienteRequestDTO atualizarClienteRequestDTO) {

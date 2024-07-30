@@ -1,10 +1,7 @@
 package dev.poncio.atualizacliente.controller;
 
-import dev.poncio.atualizacliente.dto.AtualizaProjetoRequestDTO;
-import dev.poncio.atualizacliente.dto.CriarProjetoRequestDTO;
-import dev.poncio.atualizacliente.dto.ProjetoAtualizacaoDTO;
-import dev.poncio.atualizacliente.dto.ProjetoDTO;
-import dev.poncio.atualizacliente.services.ProjetoAtualizacaoService;
+import dev.poncio.atualizacliente.dto.*;
+import dev.poncio.atualizacliente.excecoes.RegraNegocioException;
 import dev.poncio.atualizacliente.services.ProjetoService;
 import dev.poncio.atualizacliente.utils.ProjetoAtualizacaoMapper;
 import dev.poncio.atualizacliente.utils.ProjetoMapper;
@@ -26,8 +23,6 @@ public class ProjetosController {
 
     @Autowired
     private ProjetoService projetoService;
-    @Autowired
-    private ProjetoAtualizacaoService projetoAtualizacaoService;
 
     @GetMapping("/listar")
     public List<ProjetoDTO> listarProjetos() {
@@ -52,13 +47,13 @@ public class ProjetosController {
 
     @GetMapping("/listar/{id}/atualizacoes")
     public List<ProjetoAtualizacaoDTO> listarAtualizacoesProjeto(@PathVariable Long id) {
-        return this.projetoAtualizacaoService.atualizacaoPorProjeto(id)
+        return this.projetoService.listarAtualizacoes(id)
                 .stream().map(projetoAtualizacaoMapper::map).collect(Collectors.toList());
     }
 
-    @GetMapping("/listar/{token}/atualizacoes/token")
-    public ProjetoAtualizacaoDTO listarAtualizacoesProjeto(@PathVariable String token) {
-        return this.projetoAtualizacaoMapper.map(this.projetoAtualizacaoService.atualizacaoBuscaPorToken(token));
+    @PostMapping("/listar/{token}/atualizacoes/token")
+    public ProjetoAtualizacaoDTO listarAtualizacoesProjeto(@PathVariable String token, @RequestBody SenhaClienteRequestDTO senhaClienteRequestDTO) throws RegraNegocioException {
+        return this.projetoAtualizacaoMapper.map(this.projetoService.retornarAtualizacaoPorToken(senhaClienteRequestDTO.getSenhaCliente(), token));
     }
 
 }

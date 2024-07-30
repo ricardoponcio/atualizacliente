@@ -56,8 +56,8 @@ public class WebSecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/login").permitAll()
-                        .requestMatchers("/usuario/cadastro").anonymous()
-                        .requestMatchers("/projetos/listar/*/atualizacoes/token").anonymous()
+                        .requestMatchers("/usuario/cadastro").permitAll()
+                        .requestMatchers("/projetos/listar/*/atualizacoes/token").permitAll()
                         //.requestMatchers("/**").hasAuthority("ADMIN")
                         .anyRequest().authenticated()
                 );
