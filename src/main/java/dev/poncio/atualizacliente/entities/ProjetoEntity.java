@@ -5,6 +5,7 @@ import lombok.Data;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Stream;
 
 @Entity
 @Table(name = "projeto")
@@ -28,6 +29,10 @@ public class ProjetoEntity {
         public String toString() {
             return this.getDescricao();
         }
+
+        public static ProjetoStatus valueOfDesc(String descricao) {
+            return Stream.of(ProjetoStatus.values()).filter(status -> status.getDescricao().equals(descricao)).findFirst().orElse(null);
+        }
     }
 
     public static enum ProjetoSubStatus {
@@ -46,6 +51,10 @@ public class ProjetoEntity {
         @Override
         public String toString() {
             return this.getDescricao();
+        }
+
+        public static ProjetoSubStatus valueOfDesc(String descricao) {
+            return Stream.of(ProjetoSubStatus.values()).filter(status -> status.getDescricao().equals(descricao)).findFirst().orElse(null);
         }
     }
 

@@ -56,4 +56,9 @@ public class ProjetosController {
         return this.projetoAtualizacaoMapper.map(this.projetoService.retornarAtualizacaoPorToken(senhaClienteRequestDTO.getSenhaCliente(), token));
     }
 
+    @PutMapping("/{projetoId}/atualizacoes/criar")
+    public ProjetoAtualizacaoDTO inserirAtualizacao(@PathVariable Long projetoId, @RequestBody CriarProjetoAtualizacaoRequestDTO criarProjetoAtualizacaoRequestDTO) throws RegraNegocioException {
+        return this.projetoAtualizacaoMapper.map(this.projetoService.emitirNovaAtualizacao(projetoId, criarProjetoAtualizacaoRequestDTO));
+    }
+
 }

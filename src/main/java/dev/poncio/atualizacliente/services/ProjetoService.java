@@ -1,6 +1,7 @@
 package dev.poncio.atualizacliente.services;
 
 import dev.poncio.atualizacliente.dto.AtualizaProjetoRequestDTO;
+import dev.poncio.atualizacliente.dto.CriarProjetoAtualizacaoRequestDTO;
 import dev.poncio.atualizacliente.dto.CriarProjetoRequestDTO;
 import dev.poncio.atualizacliente.entities.ClienteEntity;
 import dev.poncio.atualizacliente.entities.ProjetoAtualizacaoEntity;
@@ -60,10 +61,7 @@ public class ProjetoService {
 
         ProjetoEntity projetoAlteracoes = this.projetoMapper.map(atualizaProjetoRequestDTO);
         partialUpdateMapper.map(projetoAlteracoes, projetoSalvo);
-        ProjetoEntity projetoAlterado = this.projetoRepository.save(projetoSalvo);
-
-        this.projetoAtualizacaoService.inserirAtualizacao(projetoAlterado, authContext.getUsuarioLogado());
-        return projetoAlterado;
+        return this.projetoRepository.save(projetoSalvo);
     }
 
     public void removerProjeto(Long id) {
@@ -71,6 +69,11 @@ public class ProjetoService {
             throw new EntityNotFoundException();
 
         this.projetoRepository.deleteById(id);
+    }
+
+    public ProjetoAtualizacaoEntity emitirNovaAtualizacao(Long projetoId, CriarProjetoAtualizacaoRequestDTO criarProjetoAtualizacaoRequestDTO) {
+        ProjetoEntity projeto = this.buscarPeloId(projetoId);
+        return this.projetoAtualizacaoService.inserirAtualizacao(criarProjetoAtualizacaoRequestDTO, projeto, authContext.getUsuarioLogado());
     }
 
     public List<ProjetoAtualizacaoEntity> listarAtualizacoes(Long projetoId) {

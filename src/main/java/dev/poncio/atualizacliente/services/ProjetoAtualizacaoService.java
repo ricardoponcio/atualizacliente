@@ -1,6 +1,6 @@
 package dev.poncio.atualizacliente.services;
 
-import dev.poncio.atualizacliente.dto.ProjetoAtualizacaoDTO;
+import dev.poncio.atualizacliente.dto.CriarProjetoAtualizacaoRequestDTO;
 import dev.poncio.atualizacliente.entities.ProjetoAtualizacaoEntity;
 import dev.poncio.atualizacliente.entities.ProjetoEntity;
 import dev.poncio.atualizacliente.entities.UsuarioEntity;
@@ -30,15 +30,15 @@ public class ProjetoAtualizacaoService {
         return this.projetoAtualizacaoRepository.findByTokenView(token).orElseThrow(EntityNotFoundException::new);
     }
 
-    public ProjetoAtualizacaoEntity inserirAtualizacao(ProjetoEntity projetoAtualizado, UsuarioEntity usuarioLogado) {
+    public ProjetoAtualizacaoEntity inserirAtualizacao(CriarProjetoAtualizacaoRequestDTO criarProjetoAtualizacaoRequestDTO, ProjetoEntity projeto, UsuarioEntity usuarioLogado) {
         return inserirAtualizacao(ProjetoAtualizacaoEntity.builder()
-                .projeto(projetoAtualizado)
+                .projeto(projeto)
                 .criadoEm(LocalDateTime.now())
                 .criadoPor(usuarioLogado)
-                .titulo(projetoAtualizado.getNome())
-                .descricao(projetoAtualizado.getDescricao())
-                .status(projetoAtualizado.getStatus())
-                .subStatus(projetoAtualizado.getSubStatus())
+                .titulo(projeto.getNome())
+                .descricao(criarProjetoAtualizacaoRequestDTO.getDescricao())
+                .status(ProjetoEntity.ProjetoStatus.valueOfDesc(criarProjetoAtualizacaoRequestDTO.getStatus()))
+                .subStatus(ProjetoEntity.ProjetoSubStatus.valueOfDesc(criarProjetoAtualizacaoRequestDTO.getSubStatus()))
                 .tokenView(UUID.randomUUID().toString()).build());
     }
 
