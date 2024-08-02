@@ -29,6 +29,11 @@ public class ProjetosController {
         return this.projetoService.listarProjetos().stream().map(projetoMapper::map).collect(Collectors.toList());
     }
 
+    @GetMapping("/{id}/detalhe")
+    public ProjetoDTO detalharProjeto(@PathVariable Long id) {
+        return this.projetoMapper.map(this.projetoService.buscarPeloId(id));
+    }
+
     @PutMapping("/criar")
     public ProjetoDTO criarProjeto(@RequestBody CriarProjetoRequestDTO criarProjetoRequestDTO) {
         return projetoMapper.map(this.projetoService.inserirProjeto(criarProjetoRequestDTO));
