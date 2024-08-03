@@ -22,6 +22,10 @@ public class ProjetoAtualizacaoService {
     @Autowired
     private ProjetoAtualizacaoEmailService projetoAtualizacaoEmailService;
 
+    public ProjetoAtualizacaoEntity buscarPeloIf(Long projetoAtualizacaoId) {
+        return this.projetoAtualizacaoRepository.findById(projetoAtualizacaoId).orElseThrow(EntityNotFoundException::new);
+    }
+
     public List<ProjetoAtualizacaoEntity> atualizacaoPorProjeto(Long projetoId) {
         return this.projetoAtualizacaoRepository.findAllByProjetoId(projetoId);
     }

@@ -80,6 +80,10 @@ public class ProjetoService {
         return this.projetoAtualizacaoService.atualizacaoPorProjeto(projetoId);
     }
 
+    public ProjetoAtualizacaoEntity detalharAtualizacao(Long projetoAtualizacaoId) {
+        return this.projetoAtualizacaoService.buscarPeloIf(projetoAtualizacaoId);
+    }
+
     public ProjetoAtualizacaoEntity retornarAtualizacaoPorToken(String senhaCliente, String token) throws RegraNegocioException {
         ProjetoAtualizacaoEntity projetoAtualizacaoEntity = this.projetoAtualizacaoService.atualizacaoBuscaPorToken(token);
         ClienteEntity cliente = projetoAtualizacaoEntity.getProjeto().getCliente();

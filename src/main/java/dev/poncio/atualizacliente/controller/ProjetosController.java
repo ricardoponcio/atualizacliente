@@ -56,6 +56,11 @@ public class ProjetosController {
                 .stream().map(projetoAtualizacaoMapper::map).collect(Collectors.toList());
     }
 
+    @GetMapping("/atualizacao/{id}/detalhe")
+    public ProjetoAtualizacaoDTO detalharProjetoAtualizacao(@PathVariable("id") Long projetoAtualizacaoId) {
+        return this.projetoAtualizacaoMapper.map(this.projetoService.detalharAtualizacao(projetoAtualizacaoId));
+    }
+
     @PostMapping("/listar/{token}/atualizacoes/token")
     public ProjetoAtualizacaoDTO listarAtualizacoesProjeto(@PathVariable String token, @RequestBody SenhaClienteRequestDTO senhaClienteRequestDTO) throws RegraNegocioException {
         return this.projetoAtualizacaoMapper.map(this.projetoService.retornarAtualizacaoPorToken(senhaClienteRequestDTO.getSenhaCliente(), token));
