@@ -1,9 +1,7 @@
 package dev.poncio.atualizacliente.services;
 
-import dev.poncio.atualizacliente.dto.AtualizarClienteRequestDTO;
 import dev.poncio.atualizacliente.dto.AtualizarConfiguracaoEmailDTO;
 import dev.poncio.atualizacliente.dto.CriarConfiguracaoEmailDTO;
-import dev.poncio.atualizacliente.entities.ClienteEntity;
 import dev.poncio.atualizacliente.entities.ConfiguracaoEmailEntity;
 import dev.poncio.atualizacliente.excecoes.RegraNegocioException;
 import dev.poncio.atualizacliente.repositories.IConfiguracaoEmailRepository;
@@ -17,7 +15,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class ConfiguracaoEmailService {
@@ -61,6 +58,14 @@ public class ConfiguracaoEmailService {
             throw new EntityNotFoundException();
 
         this.configuracaoEmailRepository.deleteById(id);
+    }
+
+    public ConfiguracaoEmailEntity get() {
+        List<ConfiguracaoEmailEntity> configuracoes = this.configuracaoEmailRepository.findAll();
+        if (configuracoes.size() == 1) {
+            return configuracoes.get(0);
+        }
+        return null;
     }
 
 }

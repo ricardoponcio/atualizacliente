@@ -20,10 +20,12 @@ public class ConfiguracaoEmailEntity {
     private Long smtpPort;
     @Column(name = "smtp_ssl")
     private Boolean smtpSsl;
+    @Column(name = "smtp_tls")
+    private Boolean smtpTls;
     @Column(name = "smtp_auth")
     private Boolean smtpAuth;
     @Column(name = "smtp_user")
-    private String smtpHUser;
+    private String smtpUser;
     @Column(name = "smtp_password")
     private String smtpPassword;
     @Column(name = "criado_em")

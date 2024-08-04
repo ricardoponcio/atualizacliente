@@ -1,5 +1,6 @@
 package dev.poncio.atualizacliente.services;
 
+import dev.poncio.atualizacliente.entities.ConfiguracaoEmailEntity;
 import dev.poncio.atualizacliente.entities.ProjetoAtualizacaoEmailEntity;
 import dev.poncio.atualizacliente.entities.ProjetoAtualizacaoEntity;
 import dev.poncio.atualizacliente.repositories.IProjetoAtualizacaoEmailRepository;
@@ -7,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class ProjetoAtualizacaoEmailService {
@@ -28,6 +30,32 @@ public class ProjetoAtualizacaoEmailService {
 
     private ProjetoAtualizacaoEmailEntity registraIntencaoEmail(ProjetoAtualizacaoEmailEntity projetoAtualizacaoEmail) {
         return this.projetoAtualizacaoEmailRepository.save(projetoAtualizacaoEmail);
+    }
+
+    public List<ProjetoAtualizacaoEmailEntity> listarPendentes() {
+        return this.projetoAtualizacaoEmailRepository.findAllByEnvioProcessadoEmIsNull();
+    }
+
+    public void atualizaSucessoPosEnvioEmail(ProjetoAtualizacaoEmailEntity projetoAtualizacaoEmail, ConfiguracaoEmailEntity configuracaoEmail) {
+        mergeData(configuracaoEmail, projetoAtualizacaoEmail);
+        projetoAtualizacaoEmail.setEnvioProcessadoEm(LocalDateTime.now());
+        projetoAtualizacaoEmail.setResultado(ProjetoAtualizacaoEmailEntity.ProjetoAtualizacaoEmailResultado.S);
+        this.projetoAtualizacaoEmailRepository.save(projetoAtualizacaoEmail);
+    }
+
+    public void atualizaErroPosEnvioEmail(ProjetoAtualizacaoEmailEntity projetoAtualizacaoEmail, ConfiguracaoEmailEntity configuracaoEmail, Exception e) {
+        mergeData(configuracaoEmail, projetoAtualizacaoEmail);
+        projetoAtualizacaoEmail.setEnvioProcessadoEm(LocalDateTime.now());
+        projetoAtualizacaoEmail.setResultado(ProjetoAtualizacaoEmailEntity.ProjetoAtualizacaoEmailResultado.F);
+        projetoAtualizacaoEmail.setMensagemErro(e.getLocalizedMessage());
+        this.projetoAtualizacaoEmailRepository.save(projetoAtualizacaoEmail);
+    }
+
+    private void mergeData(ConfiguracaoEmailEntity configuracaoEmail, ProjetoAtualizacaoEmailEntity projetoAtualizacaoEmail) {
+        projetoAtualizacaoEmail.setSmtpHost(configuracaoEmail.getSmtpHost());
+        projetoAtualizacaoEmail.setSmtpPort(configuracaoEmail.getSmtpPort());
+        projetoAtualizacaoEmail.setSmtpAuth(configuracaoEmail.getSmtpAuth());
+        projetoAtualizacaoEmail.setSmtpSsl(configuracaoEmail.getSmtpSsl());
     }
 
 }

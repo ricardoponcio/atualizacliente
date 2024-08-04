@@ -54,6 +54,16 @@ public class ProjetoAtualizacaoEmailEntity {
     private ProjetoAtualizacaoEmailResultado resultado;
     @Column(name = "mensagem_erro")
     private String mensagemErro;
+    @Column(name = "smtp_host")
+    private String smtpHost;
+    @Column(name = "smtp_port")
+    private Long smtpPort;
+    @Column(name = "smtp_ssl")
+    private Boolean smtpSsl;
+    @Column(name = "smtp_tls")
+    private Boolean smtpTls;
+    @Column(name = "smtp_auth")
+    private Boolean smtpAuth;
     @OneToOne
     @JoinColumn(name = "projeto_atualizacao_id")
     private ProjetoAtualizacaoEntity projetoAtualizacao;
