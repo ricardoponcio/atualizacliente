@@ -6,7 +6,7 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 @Data
-public class ProjetoAtualizacaoEmailSimplificadoDTO {
+public class EnvioEmailSimplificadoDTO {
 
     private Long id;
     private String emailDestino;

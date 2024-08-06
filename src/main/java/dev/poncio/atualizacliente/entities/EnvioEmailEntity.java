@@ -9,19 +9,43 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "projeto_atualizacao_email")
+@Table(name = "envio_email")
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProjetoAtualizacaoEmailEntity {
+public class EnvioEmailEntity {
 
-    public static enum ProjetoAtualizacaoEmailResultado {
+    public static enum EnvioEmailResultado {
         S("Enviado com sucesso"), F("Falha no envio");
 
         private String descricao;
 
-        ProjetoAtualizacaoEmailResultado(String descricao) {
+        EnvioEmailResultado(String descricao) {
+            this.descricao = descricao;
+        }
+
+        public String getDescricao() {
+            return this.descricao;
+        }
+
+        @Override
+        public String toString() {
+            return this.getDescricao();
+        }
+    }
+
+    public static enum EnvioEmailTipo {
+        CLIENTE_VALIDACAO("Validação Cliente"),
+        CLIENTE_RESET_SENHA("Troca de senha Cliente"),
+        USUARIO_VALIDACAO("Validação Usuário"),
+        USUARIO_RESET_SENHA("Troca de senha Usuário"),
+        PROJETO_ATUALIZACAO("Atualização de Projeto"),
+        PROJETO_CRIACAO("Criação de Projeto");
+
+        private String descricao;
+
+        EnvioEmailTipo(String descricao) {
             this.descricao = descricao;
         }
 
@@ -51,7 +75,7 @@ public class ProjetoAtualizacaoEmailEntity {
     private LocalDateTime envioProcessadoEm;
     @Column
     @Enumerated(EnumType.STRING)
-    private ProjetoAtualizacaoEmailResultado resultado;
+    private EnvioEmailResultado resultado;
     @Column(name = "mensagem_erro")
     private String mensagemErro;
     @Column(name = "smtp_host")
@@ -64,8 +88,20 @@ public class ProjetoAtualizacaoEmailEntity {
     private Boolean smtpTls;
     @Column(name = "smtp_auth")
     private Boolean smtpAuth;
+    @Column(name = "tipo_email")
+    @Enumerated(EnumType.STRING)
+    private EnvioEmailTipo tipo;
     @OneToOne
     @JoinColumn(name = "projeto_atualizacao_id")
     private ProjetoAtualizacaoEntity projetoAtualizacao;
+    @OneToOne
+    @JoinColumn(name = "cliente_id")
+    private ClienteEntity cliente;
+    @OneToOne
+    @JoinColumn(name = "usuario_id")
+    private UsuarioEntity usuario;
+    @OneToOne
+    @JoinColumn(name = "configuracao_email_id")
+    private ConfiguracaoEmailEntity configuracaoEmail;
 
 }

@@ -63,9 +63,26 @@ create table projeto_atualizacao (
 	projeto_id bigint not null references projeto(id)
 );
 
+--drop table configuracao_email;
+create table configuracao_email (
+	id serial primary key,
+	smtp_host text not null,
+	smtp_port bigint not null,
+	smtp_ssl boolean not null,
+	smtp_tls boolean not null,
+	smtp_auth boolean not null,
+	smtp_user text null,
+	smtp_password text null,
+	criado_em timestamp(6) not null default current_timestamp,
+	criado_por_id bigint not null references usuario(id),
+	ultimo_uso_sucesso timestamp(6) null
+);
+
 -- Resultado: S Enviado com Sucesso, F Falha no envio
---drop table projeto_atualizacao_email;
-create table projeto_atualizacao_email (
+-- Tipo: CLIENTE_VALIDACAO, CLIENTE_RESET_SENHA, USUARIO_VALIDACAO, USUARIO_RESET_SENHA,
+--			PROJETO_ATUALIZACAO, PROJETO_CRIACAO
+--drop table envio_email;
+create table envio_email (
 	id serial primary key,
 	email_destino text not null,
 	assunto text not null,
@@ -74,5 +91,14 @@ create table projeto_atualizacao_email (
 	envio_processado_em timestamp(6) null default current_timestamp,
 	resultado varchar(1) null,
 	mensagem_erro text null,
-	projeto_atualizacao_id bigint not null references projeto_atualizacao(id)
+	smtp_host text null,
+	smtp_port bigint null,
+	smtp_ssl boolean null,
+	smtp_tls boolean null,
+	smtp_auth boolean null,
+	tipo_email text not null,
+	projeto_atualizacao_id bigint null references projeto_atualizacao(id),
+	cliente_id bigint null references cliente(id),
+	usuario_id bigint null references usuario(id),
+	configuracao_email_id bigint null references configuracao_email(id)
 );

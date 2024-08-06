@@ -41,7 +41,6 @@ public class ProjetoAtualizacaoEntity {
     @JoinColumn(name = "projeto_id")
     private ProjetoEntity projeto;
     @OneToOne(mappedBy = "projetoAtualizacao", cascade = CascadeType.REMOVE)
-    private ProjetoAtualizacaoEmailEntity email;
-
+    private EnvioEmailEntity email;
 
 }

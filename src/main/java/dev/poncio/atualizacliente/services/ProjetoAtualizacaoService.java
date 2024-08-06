@@ -20,7 +20,7 @@ public class ProjetoAtualizacaoService {
     private IProjetoAtualizacaoRepository projetoAtualizacaoRepository;
 
     @Autowired
-    private ProjetoAtualizacaoEmailService projetoAtualizacaoEmailService;
+    private EnvioEmailService envioEmailService;
 
     public ProjetoAtualizacaoEntity buscarPeloIf(Long projetoAtualizacaoId) {
         return this.projetoAtualizacaoRepository.findById(projetoAtualizacaoId).orElseThrow(EntityNotFoundException::new);
@@ -48,7 +48,7 @@ public class ProjetoAtualizacaoService {
 
     private ProjetoAtualizacaoEntity inserirAtualizacao(ProjetoAtualizacaoEntity projetoAtualizacao) {
         ProjetoAtualizacaoEntity projetoAtualizacaoCriado = this.projetoAtualizacaoRepository.save(projetoAtualizacao);
-        this.projetoAtualizacaoEmailService.registraIntencaoEmail(projetoAtualizacaoCriado);
+        this.envioEmailService.registraIntencaoEmail(projetoAtualizacaoCriado);
         return projetoAtualizacaoCriado;
     }
 

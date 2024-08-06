@@ -1,7 +1,7 @@
 package dev.poncio.atualizacliente.runners;
 
 import dev.poncio.atualizacliente.entities.ConfiguracaoEmailEntity;
-import dev.poncio.atualizacliente.entities.ProjetoAtualizacaoEmailEntity;
+import dev.poncio.atualizacliente.entities.EnvioEmailEntity;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -14,12 +14,12 @@ import java.util.Properties;
 @Component
 public class EnvioEmailRunner {
 
-    public void enviarEmailAtualizacaoProjeto(ConfiguracaoEmailEntity configuracao, ProjetoAtualizacaoEmailEntity projetoAtualizacaoEmail) {
+    public void enviarEmailAtualizacaoProjeto(ConfiguracaoEmailEntity configuracao, EnvioEmailEntity envioEmail) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom("noreply@attcliente.poncio.dev");
-        message.setTo(projetoAtualizacaoEmail.getEmailDestino());
-        message.setSubject("Atualização de Projeto - " + projetoAtualizacaoEmail.getProjetoAtualizacao().getTitulo());
-        message.setText("Veja na aplicação https://localhost:8081/atualizacao?__token_visualizacao_atualizacao=" + projetoAtualizacaoEmail.getProjetoAtualizacao().getTokenView());
+        message.setTo(envioEmail.getEmailDestino());
+        message.setSubject(envioEmail.getAssunto());
+        message.setText(envioEmail.getCorpo());
 
         JavaMailSender emailSender = implementSender(configuracao);
         emailSender.send(message);

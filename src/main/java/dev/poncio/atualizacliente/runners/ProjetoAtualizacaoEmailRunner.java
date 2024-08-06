@@ -2,7 +2,7 @@ package dev.poncio.atualizacliente.runners;
 
 import dev.poncio.atualizacliente.excecoes.RegraNegocioException;
 import dev.poncio.atualizacliente.services.ConfiguracaoEmailService;
-import dev.poncio.atualizacliente.services.ProjetoAtualizacaoEmailService;
+import dev.poncio.atualizacliente.services.EnvioEmailService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 public class ProjetoAtualizacaoEmailRunner {
 
     @Autowired
-    private ProjetoAtualizacaoEmailService projetoAtualizacaoEmailService;
+    private EnvioEmailService envioEmailService;
 
     @Autowired
     private ConfiguracaoEmailService configuracaoEmailService;
@@ -26,13 +26,13 @@ public class ProjetoAtualizacaoEmailRunner {
         try {
             final var configuracaoEmail = this.configuracaoEmailService.get();
             if (configuracaoEmail == null) throw new RegraNegocioException("Configuração de e-mail não cadastrada");
-            final var emailPendenteLista = this.projetoAtualizacaoEmailService.listarPendentes();
+            final var emailPendenteLista = this.envioEmailService.listarPendentes();
             emailPendenteLista.stream().forEach(emailPendente -> {
                 try {
                     envioEmailRunner.enviarEmailAtualizacaoProjeto(configuracaoEmail, emailPendente);
-                    this.projetoAtualizacaoEmailService.atualizaSucessoPosEnvioEmail(emailPendente, configuracaoEmail);
+                    this.envioEmailService.atualizaSucessoPosEnvioEmail(emailPendente, configuracaoEmail);
                 } catch (Exception e) {
-                    this.projetoAtualizacaoEmailService.atualizaErroPosEnvioEmail(emailPendente, configuracaoEmail, e);
+                    this.envioEmailService.atualizaErroPosEnvioEmail(emailPendente, configuracaoEmail, e);
                     log.error("Erro ao enviar email ID " + emailPendente.getId());
                 }
             });
