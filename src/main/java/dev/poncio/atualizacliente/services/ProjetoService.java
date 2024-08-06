@@ -96,4 +96,11 @@ public class ProjetoService {
         return projetoAtualizacaoEntity;
     }
 
+    public ProjetoEntity atualizaStatusProjeto(ProjetoAtualizacaoEntity projetoAtualizacao) {
+        ProjetoEntity projetoSalvo = buscarPeloId(projetoAtualizacao.getProjeto().getId());
+        projetoSalvo.setStatus(projetoAtualizacao.getStatus());
+        projetoSalvo.setSubStatus(projetoAtualizacao.getSubStatus());
+        return this.projetoRepository.save(projetoSalvo);
+    }
+
 }

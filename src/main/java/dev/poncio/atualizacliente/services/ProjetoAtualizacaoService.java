@@ -22,6 +22,9 @@ public class ProjetoAtualizacaoService {
     @Autowired
     private EnvioEmailService envioEmailService;
 
+    @Autowired
+    private ProjetoService projetoService;
+
     public ProjetoAtualizacaoEntity buscarPeloIf(Long projetoAtualizacaoId) {
         return this.projetoAtualizacaoRepository.findById(projetoAtualizacaoId).orElseThrow(EntityNotFoundException::new);
     }
@@ -48,6 +51,7 @@ public class ProjetoAtualizacaoService {
 
     private ProjetoAtualizacaoEntity inserirAtualizacao(ProjetoAtualizacaoEntity projetoAtualizacao) {
         ProjetoAtualizacaoEntity projetoAtualizacaoCriado = this.projetoAtualizacaoRepository.save(projetoAtualizacao);
+        this.projetoService.atualizaStatusProjeto(projetoAtualizacaoCriado);
         this.envioEmailService.registraIntencaoEmail(projetoAtualizacaoCriado);
         return projetoAtualizacaoCriado;
     }
