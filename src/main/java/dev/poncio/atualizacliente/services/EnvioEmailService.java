@@ -59,4 +59,8 @@ public class EnvioEmailService {
         envioEmail.setSmtpSsl(configuracaoEmail.getSmtpSsl());
     }
 
+    public List<EnvioEmailEntity> ultimosEmailsProcessados() {
+        return this.envioEmailRepository.findTop10ByEnvioProcessadoEmIsNotNullOrderByIdDesc();
+    }
+
 }

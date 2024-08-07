@@ -11,4 +11,6 @@ public interface IEnvioEmailRepository extends JpaRepository<EnvioEmailEntity, L
 
     List<EnvioEmailEntity> findAllByEnvioProcessadoEmIsNull();
 
+    List<EnvioEmailEntity> findTop10ByEnvioProcessadoEmIsNotNullOrderByIdDesc();
+
 }
