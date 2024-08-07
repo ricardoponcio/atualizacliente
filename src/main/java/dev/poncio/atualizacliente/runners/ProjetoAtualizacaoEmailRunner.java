@@ -25,7 +25,7 @@ public class ProjetoAtualizacaoEmailRunner {
     public void enviarEmails() {
         try {
             final var configuracaoEmail = this.configuracaoEmailService.get();
-            if (configuracaoEmail == null) throw new RegraNegocioException("Configuração de e-mail não cadastrada");
+            if (configuracaoEmail == null) return;
             final var emailPendenteLista = this.envioEmailService.listarPendentes();
             emailPendenteLista.stream().forEach(emailPendente -> {
                 try {

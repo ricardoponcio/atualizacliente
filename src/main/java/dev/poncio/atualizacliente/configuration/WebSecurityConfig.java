@@ -59,6 +59,7 @@ public class WebSecurityConfig {
                         .requestMatchers("/usuario/cadastro").permitAll()
                         .requestMatchers("/projetos/listar/*/atualizacoes/token").permitAll()
                         .requestMatchers("/clientes/validar/*").permitAll()
+                        .requestMatchers("/setup/check-needed").permitAll()
                         //.requestMatchers("/**").hasAuthority("ADMIN")
                         .anyRequest().authenticated()
                 );

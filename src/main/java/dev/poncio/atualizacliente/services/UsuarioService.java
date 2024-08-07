@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -31,6 +32,8 @@ public class UsuarioService implements UserDetailsService {
     private ModelMapper partialUpdateMapper;
     @Autowired
     private AuthContext authContext;
+    @Autowired
+    private BCryptPasswordEncoder passwordEncoder;
 
 
     @Override
@@ -38,7 +41,7 @@ public class UsuarioService implements UserDetailsService {
         return new CustomUserDetails(this.buscarUsuarioPorEmail(username));
     }
 
-    private boolean possuiAlgumUsuarioCadastrado() {
+    public boolean possuiAlgumUsuarioCadastrado() {
         return !usuarioRepository.findAll().isEmpty();
     }
 
@@ -48,15 +51,23 @@ public class UsuarioService implements UserDetailsService {
 
     public UsuarioEntity cadastraUsuario(CriaUsuarioRequestDTO criaUsuarioRequestDTO) throws Exception {
         boolean isCadastroPermitido = permiteCadastro != null && permiteCadastro;
-        if (possuiAlgumUsuarioCadastrado() && !isCadastroPermitido)
+        boolean possuiUsuarioCadastrado = possuiAlgumUsuarioCadastrado();
+        if (possuiUsuarioCadastrado && !isCadastroPermitido)
             throw new Exception("Não é possível realizar novos cadastros");
-        if (buscarUsuarioPorEmail(criaUsuarioRequestDTO.getEmail()) != null)
+        try {
+            buscarUsuarioPorEmail(criaUsuarioRequestDTO.getEmail());
             throw new Exception("Email já cadastrado");
+        } catch (Exception e) {
+            // Usuário não existe
+        }
         UsuarioEntity usuarioNovo = this.usuarioMapper.map(criaUsuarioRequestDTO);
         usuarioNovo.setValidado(false);
         usuarioNovo.setAtivo(true);
         usuarioNovo.setCriadoEm(LocalDateTime.now());
         usuarioNovo.setCriadoPor(authContext.getUsuarioLogado());
+        usuarioNovo.setSenha(this.passwordEncoder.encode(usuarioNovo.getSenha()));
+        usuarioNovo.setValidado(!possuiUsuarioCadastrado);
+        usuarioNovo.setValidadoEm(LocalDateTime.now());
         return this.usuarioRepository.save(usuarioNovo);
     }
 
