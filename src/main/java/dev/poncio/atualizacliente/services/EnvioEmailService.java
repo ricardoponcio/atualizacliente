@@ -40,14 +40,14 @@ public class EnvioEmailService {
     public void atualizaSucessoPosEnvioEmail(EnvioEmailEntity envioEmail, ConfiguracaoEmailEntity configuracaoEmail) {
         mergeData(configuracaoEmail, envioEmail);
         envioEmail.setEnvioProcessadoEm(LocalDateTime.now());
-        envioEmail.setResultado(EnvioEmailEntity.EnvioEmailResultado.S);
+        envioEmail.setResultado(EnvioEmailEntity.EnvioEmailResultado.ENVIADO_SUCESSO);
         this.envioEmailRepository.save(envioEmail);
     }
 
     public void atualizaErroPosEnvioEmail(EnvioEmailEntity envioEmail, ConfiguracaoEmailEntity configuracaoEmail, Exception e) {
         mergeData(configuracaoEmail, envioEmail);
         envioEmail.setEnvioProcessadoEm(LocalDateTime.now());
-        envioEmail.setResultado(EnvioEmailEntity.EnvioEmailResultado.F);
+        envioEmail.setResultado(EnvioEmailEntity.EnvioEmailResultado.ENVIO_FALHOU);
         envioEmail.setMensagemErro(e.getLocalizedMessage());
         this.envioEmailRepository.save(envioEmail);
     }

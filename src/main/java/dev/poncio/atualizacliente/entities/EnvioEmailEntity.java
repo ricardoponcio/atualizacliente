@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 public class EnvioEmailEntity {
 
     public static enum EnvioEmailResultado {
-        S("Enviado com sucesso"), F("Falha no envio");
+        ENVIADO_SUCESSO("Enviado com sucesso"), ENVIO_FALHOU("Falha no envio");
 
         private String descricao;
 
@@ -29,10 +29,6 @@ public class EnvioEmailEntity {
             return this.descricao;
         }
 
-        @Override
-        public String toString() {
-            return this.getDescricao();
-        }
     }
 
     public static enum EnvioEmailTipo {

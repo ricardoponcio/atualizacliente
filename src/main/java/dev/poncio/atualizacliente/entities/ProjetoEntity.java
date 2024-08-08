@@ -13,7 +13,7 @@ import java.util.stream.Stream;
 public class ProjetoEntity {
 
     public static enum ProjetoStatus {
-        A("Aberto"), C("Concluído");
+        ABERTO("Aberto"), CONCLUIDO("Concluído");
 
         private String descricao;
 
@@ -25,18 +25,13 @@ public class ProjetoEntity {
             return this.descricao;
         }
 
-        @Override
-        public String toString() {
-            return this.getDescricao();
-        }
-
         public static ProjetoStatus valueOfDesc(String descricao) {
             return Stream.of(ProjetoStatus.values()).filter(status -> status.getDescricao().equals(descricao)).findFirst().orElse(null);
         }
     }
 
     public static enum ProjetoSubStatus {
-        F("Na Fila"), B("Bloqueado"), A("Em Andamento"), R("Em Revisão"), P("Aguardando Pagamento"), G("Finalizado");
+        NA_FILA("Na Fila"), BLOQUEADO("Bloqueado"), EM_ANDAMENTO("Em Andamento"), EM_REVISAO("Em Revisão"), AGUARDANDO_PAGAMENTO("Aguardando Pagamento"), FINALIZADO("Finalizado");
 
         private String descricao;
 
@@ -46,11 +41,6 @@ public class ProjetoEntity {
 
         public String getDescricao() {
             return this.descricao;
-        }
-
-        @Override
-        public String toString() {
-            return this.getDescricao();
         }
 
         public static ProjetoSubStatus valueOfDesc(String descricao) {

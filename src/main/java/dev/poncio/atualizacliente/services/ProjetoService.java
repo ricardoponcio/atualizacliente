@@ -46,8 +46,8 @@ public class ProjetoService {
 
     public ProjetoEntity inserirProjeto(CriarProjetoRequestDTO criarProjetoRequestDTO) {
         ProjetoEntity novoProjeto = projetoMapper.map(criarProjetoRequestDTO);
-        novoProjeto.setStatus(ProjetoEntity.ProjetoStatus.A);
-        novoProjeto.setSubStatus(ProjetoEntity.ProjetoSubStatus.F);
+        novoProjeto.setStatus(ProjetoEntity.ProjetoStatus.ABERTO);
+        novoProjeto.setSubStatus(ProjetoEntity.ProjetoSubStatus.NA_FILA);
         novoProjeto.setCriadoEm(LocalDateTime.now());
         novoProjeto.setCriadoPor(authContext.getUsuarioLogado());
         novoProjeto.setCliente(clienteService.buscarPeloId(criarProjetoRequestDTO.getClienteId()));
