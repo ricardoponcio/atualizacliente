@@ -110,6 +110,7 @@ create table configuracao_armazenamento_s3 (
 	s3_region text not null,
 	s3_access_key text not null,
 	s3_secret_key text not null,
+	s3_bucket_name text not null,
 	prefixo_base text null,
 	criado_em timestamp(6) not null default current_timestamp,
 	criado_por_id bigint not null references usuario(id),

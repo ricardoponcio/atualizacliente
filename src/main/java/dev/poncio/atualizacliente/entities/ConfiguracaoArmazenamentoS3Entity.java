@@ -22,6 +22,8 @@ public class ConfiguracaoArmazenamentoS3Entity {
     private String s3AccessKey;
     @Column(name = "s3_secret_key")
     private String s3SecretKey;
+    @Column(name = "s3_bucket_name")
+    private String s3BucketName;
     @Column(name = "prefixo_base")
     private String prefixoBase;
     @Column(name = "criado_em")
