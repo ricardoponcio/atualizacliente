@@ -1,6 +1,7 @@
 package dev.poncio.atualizacliente.services;
 
 import dev.poncio.atualizacliente.dto.CriarProjetoAtualizacaoRequestDTO;
+import dev.poncio.atualizacliente.dto.DownloadArquivoDTO;
 import dev.poncio.atualizacliente.entities.ArquivoS3Entity;
 import dev.poncio.atualizacliente.entities.ProjetoAtualizacaoEntity;
 import dev.poncio.atualizacliente.entities.ProjetoEntity;
@@ -11,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -47,7 +49,7 @@ public class ProjetoAtualizacaoService {
         ProjetoAtualizacaoEntity atualizacao = inserirAtualizacao(criarProjetoAtualizacaoRequestDTO, projeto, usuarioLogado);
 
         List<ArquivoS3Entity> anexosSalvos = new ArrayList<>();
-        for (MultipartFile anexo: anexos) {
+        for (MultipartFile anexo : anexos) {
             ArquivoS3Entity anexoSalvo = this.armazenamentoService.uploadAnexoProjetoAtualizacao(anexo, atualizacao);
             anexosSalvos.add(anexoSalvo);
         }
@@ -73,6 +75,26 @@ public class ProjetoAtualizacaoService {
         this.projetoService.atualizaStatusProjeto(projetoAtualizacaoCriado);
         this.envioEmailService.registraIntencaoEmail(projetoAtualizacaoCriado);
         return projetoAtualizacaoCriado;
+    }
+
+    public DownloadArquivoDTO baixarArquivo(ProjetoEntity projetoEntity, Long projetoAtualizacaoId, String nomeArquivoUpload) {
+        ProjetoAtualizacaoEntity projetoAtualizacao = this.projetoAtualizacaoRepository
+                .findByIdAndProjetoId(projetoAtualizacaoId, projetoEntity.getId()).orElseThrow(EntityNotFoundException::new);
+        return baixarAnexo(projetoAtualizacao, nomeArquivoUpload);
+    }
+
+    public DownloadArquivoDTO baixarArquivoToken(ProjetoEntity projetoEntity, Long projetoAtualizacaoId, String nomeArquivoUpload, String token) {
+        ProjetoAtualizacaoEntity projetoAtualizacao = this.projetoAtualizacaoRepository
+                .findByIdAndProjetoIdAndTokenView(projetoAtualizacaoId, projetoEntity.getId(), token).orElseThrow(EntityNotFoundException::new);
+        return baixarAnexo(projetoAtualizacao, nomeArquivoUpload);
+    }
+
+    private DownloadArquivoDTO baixarAnexo(ProjetoAtualizacaoEntity projetoAtualizacao, String nomeArquivoUpload) {
+        ArquivoS3Entity arquivoS3 = projetoAtualizacao.getAnexos().stream()
+                .filter(anexo -> anexo.getArquivoNomeUpload().equals(nomeArquivoUpload)).findFirst().orElse(null);
+
+        InputStream inputStream = this.armazenamentoService.downloadFile(arquivoS3);
+        return DownloadArquivoDTO.builder().inputStream(inputStream).contentType(arquivoS3.getTipo()).nomeArquivo(arquivoS3.getArquivoNome()).build();
     }
 
 }

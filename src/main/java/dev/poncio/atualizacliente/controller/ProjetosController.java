@@ -5,7 +5,9 @@ import dev.poncio.atualizacliente.excecoes.RegraNegocioException;
 import dev.poncio.atualizacliente.services.ProjetoService;
 import dev.poncio.atualizacliente.utils.ProjetoAtualizacaoMapper;
 import dev.poncio.atualizacliente.utils.ProjetoMapper;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -60,13 +62,13 @@ public class ProjetosController {
     }
 
     @GetMapping("/atualizacao/{id}/detalhe")
-    public ProjetoAtualizacaoDTO detalharProjetoAtualizacao(@PathVariable("id") Long projetoAtualizacaoId) {
-        return this.projetoAtualizacaoMapper.map(this.projetoService.detalharAtualizacao(projetoAtualizacaoId));
+    public ProjetoAtualizacaoComProjetoDTO detalharProjetoAtualizacao(@PathVariable("id") Long projetoAtualizacaoId) {
+        return this.projetoAtualizacaoMapper.mapDetail(this.projetoService.detalharAtualizacao(projetoAtualizacaoId));
     }
 
     @PostMapping("/listar/{token}/atualizacoes/token")
-    public ProjetoAtualizacaoDTO listarAtualizacoesProjeto(@PathVariable String token, @RequestBody SenhaClienteRequestDTO senhaClienteRequestDTO) throws RegraNegocioException {
-        return this.projetoAtualizacaoMapper.map(this.projetoService.retornarAtualizacaoPorToken(senhaClienteRequestDTO.getSenhaCliente(), token));
+    public ProjetoAtualizacaoComProjetoIdDTO listarAtualizacoesProjeto(@PathVariable String token, @RequestBody SenhaClienteRequestDTO senhaClienteRequestDTO) throws RegraNegocioException {
+        return this.projetoAtualizacaoMapper.mapLessDetail(this.projetoService.retornarAtualizacaoPorToken(senhaClienteRequestDTO.getSenhaCliente(), token));
     }
 
     @PutMapping("/{projetoId}/atualizacoes/criar")
@@ -77,6 +79,26 @@ public class ProjetosController {
     @PutMapping(value = "/{projetoId}/atualizacoes/criar/com-anexos", consumes = {MediaType.APPLICATION_PROBLEM_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
     public ProjetoAtualizacaoDTO inserirAtualizacaoComAnexos(@PathVariable Long projetoId, @RequestPart("body") CriarProjetoAtualizacaoRequestDTO criarProjetoAtualizacaoRequestDTO, @RequestPart("anexo") MultipartFile[] anexo) throws RegraNegocioException {
         return this.projetoAtualizacaoMapper.map(this.projetoService.emitirNovaAtualizacaoComAnexos(projetoId, criarProjetoAtualizacaoRequestDTO, Stream.of(anexo).toList()));
+    }
+
+    @GetMapping(value = "/{projetoId}/atualizacao/{projetoAtualizacaoId}/baixar/{nomeArquivoUpload}")
+    public ResponseEntity<InputStreamResource> baixarAnexoAtualizacao(@PathVariable Long projetoId, @PathVariable Long projetoAtualizacaoId, @PathVariable String nomeArquivoUpload, HttpServletResponse response) {
+        DownloadArquivoDTO arquivo = this.projetoService.baixaAnexoProjetoAtualizacao(projetoId, projetoAtualizacaoId, nomeArquivoUpload);
+        response.setHeader("Content-Disposition", String.format("attachment; filename=\"%s\"", arquivo.getNomeArquivo()));
+        response.setHeader("Access-Control-Expose-Headers", "Content-Disposition");
+        return ResponseEntity.ok()
+                .contentType(MediaType.valueOf(arquivo.getContentType()))
+                .body(new InputStreamResource(arquivo.getInputStream()));
+    }
+
+    @GetMapping(value = "/{projetoId}/atualizacao/{projetoAtualizacaoId}/baixar/{nomeArquivoUpload}/token/{token}")
+    public ResponseEntity<InputStreamResource> baixarAnexoAtualizacao(@PathVariable Long projetoId, @PathVariable Long projetoAtualizacaoId, @PathVariable String nomeArquivoUpload, @PathVariable String token, HttpServletResponse response) {
+        DownloadArquivoDTO arquivo = this.projetoService.baixaAnexoProjetoAtualizacaoToken(projetoId, projetoAtualizacaoId, nomeArquivoUpload, token);
+        response.setHeader("Content-Disposition", String.format("attachment; filename=\"%s\"", arquivo.getNomeArquivo()));
+        response.setHeader("Access-Control-Expose-Headers", "Content-Disposition");
+        return ResponseEntity.ok()
+                .contentType(MediaType.valueOf(arquivo.getContentType()))
+                .body(new InputStreamResource(arquivo.getInputStream()));
     }
 
 }

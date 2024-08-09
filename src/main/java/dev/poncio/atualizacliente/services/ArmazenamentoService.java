@@ -5,8 +5,10 @@ import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
+import com.amazonaws.services.s3.model.GetObjectRequest;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.amazonaws.services.s3.model.PutObjectResult;
+import com.amazonaws.services.s3.model.S3Object;
 import dev.poncio.atualizacliente.entities.ArquivoS3Entity;
 import dev.poncio.atualizacliente.entities.ConfiguracaoArmazenamentoS3Entity;
 import dev.poncio.atualizacliente.entities.ProjetoAtualizacaoEntity;
@@ -64,6 +66,13 @@ public class ArmazenamentoService {
                 fileInputStream,
                 null
         ));
+    }
+
+    public InputStream downloadFile(ArquivoS3Entity arquivoBaixar) {
+        ConfiguracaoArmazenamentoS3Entity configS3 = getConfig();
+        S3Object arquivoS3 = get().getObject(
+                new GetObjectRequest(configS3.getS3BucketName(), arquivoBaixar.getArquivoCaminhoCompleto()));
+        return arquivoS3.getObjectContent();
     }
 
     private AmazonS3 get() {

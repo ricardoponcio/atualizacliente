@@ -3,6 +3,7 @@ package dev.poncio.atualizacliente.services;
 import dev.poncio.atualizacliente.dto.AtualizaProjetoRequestDTO;
 import dev.poncio.atualizacliente.dto.CriarProjetoAtualizacaoRequestDTO;
 import dev.poncio.atualizacliente.dto.CriarProjetoRequestDTO;
+import dev.poncio.atualizacliente.dto.DownloadArquivoDTO;
 import dev.poncio.atualizacliente.entities.ClienteEntity;
 import dev.poncio.atualizacliente.entities.ProjetoAtualizacaoEntity;
 import dev.poncio.atualizacliente.entities.ProjetoEntity;
@@ -107,6 +108,16 @@ public class ProjetoService {
         projetoSalvo.setStatus(projetoAtualizacao.getStatus());
         projetoSalvo.setSubStatus(projetoAtualizacao.getSubStatus());
         return this.projetoRepository.save(projetoSalvo);
+    }
+
+    public DownloadArquivoDTO baixaAnexoProjetoAtualizacao(Long projetoId, Long projetoAtualizacaoId, String nomeArquivoUpload) {
+        ProjetoEntity projetoSalvo = buscarPeloId(projetoId);
+        return this.projetoAtualizacaoService.baixarArquivo(projetoSalvo, projetoAtualizacaoId, nomeArquivoUpload);
+    }
+
+    public DownloadArquivoDTO baixaAnexoProjetoAtualizacaoToken(Long projetoId, Long projetoAtualizacaoId, String nomeArquivoUpload, String token) {
+        ProjetoEntity projetoSalvo = buscarPeloId(projetoId);
+        return this.projetoAtualizacaoService.baixarArquivoToken(projetoSalvo, projetoAtualizacaoId, nomeArquivoUpload, token);
     }
 
 }

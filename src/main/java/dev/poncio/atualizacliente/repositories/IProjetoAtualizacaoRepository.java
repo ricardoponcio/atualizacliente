@@ -14,4 +14,8 @@ public interface IProjetoAtualizacaoRepository extends JpaRepository<ProjetoAtua
 
     Optional<ProjetoAtualizacaoEntity> findByTokenView(String tokenView);
 
+    Optional<ProjetoAtualizacaoEntity> findByIdAndProjetoId(Long id, Long projetoId);
+
+    Optional<ProjetoAtualizacaoEntity> findByIdAndProjetoIdAndTokenView(Long id, Long projetoId, String tokenView);
+
 }
