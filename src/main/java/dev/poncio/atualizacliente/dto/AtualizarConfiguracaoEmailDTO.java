@@ -10,7 +10,5 @@ public class AtualizarConfiguracaoEmailDTO {
     private Boolean smtpSsl;
     private Boolean smtpTls;
     private Boolean smtpAuth;
-    private String smtpHUser;
-    private String smtpPassword;
 
 }

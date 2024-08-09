@@ -14,8 +14,6 @@ public class ConfiguracaoEmailDTO {
     private Boolean smtpSsl;
     private Boolean smtpTls;
     private Boolean smtpAuth;
-    private String smtpHUser;
-    private String smtpPassword;
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss-03:00")
     private LocalDateTime criadoEm;
     private UsuarioBasicoDTO criadoPor;

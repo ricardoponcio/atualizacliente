@@ -11,8 +11,6 @@ public class ConfiguracaoArmazenamentoS3lDTO {
     private Long id;
     private String s3ServiceEndpoint;
     private String s3Region;
-    private String s3AccessKey;
-    private String s3SecretKey;
     private String s3BucketName;
     private String prefixoBase;
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss-03:00")
