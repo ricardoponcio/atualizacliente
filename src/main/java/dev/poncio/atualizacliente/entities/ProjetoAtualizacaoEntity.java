@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "projeto_atualizacao")
@@ -42,5 +43,12 @@ public class ProjetoAtualizacaoEntity {
     private ProjetoEntity projeto;
     @OneToOne(mappedBy = "projetoAtualizacao", cascade = CascadeType.REMOVE)
     private EnvioEmailEntity email;
+
+    @ManyToMany
+    @JoinTable(
+            name = "projeto_atualizacao_anexo",
+            joinColumns = @JoinColumn(name = "projeto_atualizacao_id"),
+            inverseJoinColumns = @JoinColumn(name = "arquivo_s3_id"))
+    private List<ArquivoS3Entity> anexos;
 
 }

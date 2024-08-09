@@ -6,11 +6,14 @@ import dev.poncio.atualizacliente.services.ProjetoService;
 import dev.poncio.atualizacliente.utils.ProjetoAtualizacaoMapper;
 import dev.poncio.atualizacliente.utils.ProjetoMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @RestController
 @RequestMapping("/projetos")
@@ -69,6 +72,11 @@ public class ProjetosController {
     @PutMapping("/{projetoId}/atualizacoes/criar")
     public ProjetoAtualizacaoDTO inserirAtualizacao(@PathVariable Long projetoId, @RequestBody CriarProjetoAtualizacaoRequestDTO criarProjetoAtualizacaoRequestDTO) throws RegraNegocioException {
         return this.projetoAtualizacaoMapper.map(this.projetoService.emitirNovaAtualizacao(projetoId, criarProjetoAtualizacaoRequestDTO));
+    }
+
+    @PutMapping(value = "/{projetoId}/atualizacoes/criar/com-anexos", consumes = {MediaType.APPLICATION_PROBLEM_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
+    public ProjetoAtualizacaoDTO inserirAtualizacaoComAnexos(@PathVariable Long projetoId, @RequestPart("body") CriarProjetoAtualizacaoRequestDTO criarProjetoAtualizacaoRequestDTO, @RequestPart("anexo") MultipartFile[] anexo) throws RegraNegocioException {
+        return this.projetoAtualizacaoMapper.map(this.projetoService.emitirNovaAtualizacaoComAnexos(projetoId, criarProjetoAtualizacaoRequestDTO, Stream.of(anexo).toList()));
     }
 
 }

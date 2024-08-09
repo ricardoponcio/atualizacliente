@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 public class ProjetoAtualizacaoDTO {
@@ -17,5 +18,6 @@ public class ProjetoAtualizacaoDTO {
     private LocalDateTime criadoEm;
     private UsuarioBasicoDTO criadoPor;
     private EnvioEmailSimplificadoDTO email;
+    private List<ArquivoS3DTO> anexos;
 
 }

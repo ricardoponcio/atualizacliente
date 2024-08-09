@@ -15,6 +15,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -74,6 +75,11 @@ public class ProjetoService {
     public ProjetoAtualizacaoEntity emitirNovaAtualizacao(Long projetoId, CriarProjetoAtualizacaoRequestDTO criarProjetoAtualizacaoRequestDTO) {
         ProjetoEntity projeto = this.buscarPeloId(projetoId);
         return this.projetoAtualizacaoService.inserirAtualizacao(criarProjetoAtualizacaoRequestDTO, projeto, authContext.getUsuarioLogado());
+    }
+
+    public ProjetoAtualizacaoEntity emitirNovaAtualizacaoComAnexos(Long projetoId, CriarProjetoAtualizacaoRequestDTO criarProjetoAtualizacaoRequestDTO, List<MultipartFile> anexos) {
+        ProjetoEntity projeto = this.buscarPeloId(projetoId);
+        return this.projetoAtualizacaoService.inserirAtualizacaoComAnexos(criarProjetoAtualizacaoRequestDTO, projeto, anexos, authContext.getUsuarioLogado());
     }
 
     public List<ProjetoAtualizacaoEntity> listarAtualizacoes(Long projetoId) {
