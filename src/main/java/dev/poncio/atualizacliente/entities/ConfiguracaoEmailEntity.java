@@ -28,6 +28,8 @@ public class ConfiguracaoEmailEntity {
     private String smtpUser;
     @Column(name = "smtp_password")
     private String smtpPassword;
+    @Column(name = "enviar_de")
+    private String enviarDe;
     @Column(name = "criado_em")
     private LocalDateTime criadoEm;
     @ManyToOne

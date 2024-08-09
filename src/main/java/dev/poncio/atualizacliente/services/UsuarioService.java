@@ -2,9 +2,11 @@ package dev.poncio.atualizacliente.services;
 
 import dev.poncio.atualizacliente.configuration.CustomUserDetails;
 import dev.poncio.atualizacliente.dto.CriaUsuarioRequestDTO;
+import dev.poncio.atualizacliente.entities.EnvioEmailEntity;
 import dev.poncio.atualizacliente.entities.UsuarioEntity;
 import dev.poncio.atualizacliente.repositories.IUsuarioRepository;
 import dev.poncio.atualizacliente.utils.AuthContext;
+import dev.poncio.atualizacliente.utils.SpringResourceLoader;
 import dev.poncio.atualizacliente.utils.UsuarioMapper;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +23,9 @@ import java.time.LocalDateTime;
 @Service
 public class UsuarioService implements UserDetailsService {
 
+    @Value("${frontend.url.base:}")
+    private String frontEndUrlBase;
+
     @Value("${usuarios.permiteCadastro:}")
     private Boolean permiteCadastro;
     @Autowired
@@ -34,7 +39,8 @@ public class UsuarioService implements UserDetailsService {
     private AuthContext authContext;
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
-
+    @Autowired
+    private EnvioEmailService envioEmailService;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -68,7 +74,27 @@ public class UsuarioService implements UserDetailsService {
         usuarioNovo.setSenha(this.passwordEncoder.encode(usuarioNovo.getSenha()));
         usuarioNovo.setValidado(!possuiUsuarioCadastrado);
         usuarioNovo.setValidadoEm(LocalDateTime.now());
-        return this.usuarioRepository.save(usuarioNovo);
+        UsuarioEntity usuarioCriado = this.usuarioRepository.save(usuarioNovo);
+        if (!possuiUsuarioCadastrado) {
+            this.emailValidaUsuario(usuarioCriado);
+        }
+        return usuarioCriado;
+    }
+
+    private EnvioEmailEntity emailValidaUsuario(UsuarioEntity usuario) {
+        String corpo = SpringResourceLoader.getResourceFileAsString("static/email-templates/validar-email-usuario.html")
+                .replace("{{url_validacao_usuario}}", String.format("%s/validar-usuario?__token_validacao_usuario=%s",
+                        frontEndUrlBase, null));
+        return this.envioEmailService.enviaEmail("Validar Email",
+                corpo, usuario.getEmail(), usuario);
+    }
+
+    private EnvioEmailEntity emailResetSenhaUsuario(UsuarioEntity usuario) {
+        String corpo = SpringResourceLoader.getResourceFileAsString("static/email-templates/troca-senha-usuario.html")
+                .replace("{{url_troca_senha_usuario}}", String.format("%s/troca-senha-usuario?__token_senha_usuario=%s",
+                        frontEndUrlBase, null));
+        return this.envioEmailService.enviaEmail("Alteração de Senha",
+                corpo, usuario.getEmail(), usuario);
     }
 
 }

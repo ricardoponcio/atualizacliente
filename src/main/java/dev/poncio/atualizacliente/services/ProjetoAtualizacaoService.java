@@ -2,13 +2,12 @@ package dev.poncio.atualizacliente.services;
 
 import dev.poncio.atualizacliente.dto.CriarProjetoAtualizacaoRequestDTO;
 import dev.poncio.atualizacliente.dto.DownloadArquivoDTO;
-import dev.poncio.atualizacliente.entities.ArquivoS3Entity;
-import dev.poncio.atualizacliente.entities.ProjetoAtualizacaoEntity;
-import dev.poncio.atualizacliente.entities.ProjetoEntity;
-import dev.poncio.atualizacliente.entities.UsuarioEntity;
+import dev.poncio.atualizacliente.entities.*;
 import dev.poncio.atualizacliente.repositories.IProjetoAtualizacaoRepository;
+import dev.poncio.atualizacliente.utils.SpringResourceLoader;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -20,6 +19,9 @@ import java.util.UUID;
 
 @Service
 public class ProjetoAtualizacaoService {
+
+    @Value("${frontend.url.base:}")
+    private String frontEndUrlBase;
 
     @Autowired
     private IProjetoAtualizacaoRepository projetoAtualizacaoRepository;
@@ -73,7 +75,7 @@ public class ProjetoAtualizacaoService {
     private ProjetoAtualizacaoEntity inserirAtualizacao(ProjetoAtualizacaoEntity projetoAtualizacao) {
         ProjetoAtualizacaoEntity projetoAtualizacaoCriado = this.projetoAtualizacaoRepository.save(projetoAtualizacao);
         this.projetoService.atualizaStatusProjeto(projetoAtualizacaoCriado);
-        this.envioEmailService.registraIntencaoEmail(projetoAtualizacaoCriado);
+        this.emailNovaAtualizacao(projetoAtualizacaoCriado);
         return projetoAtualizacaoCriado;
     }
 
@@ -95,6 +97,15 @@ public class ProjetoAtualizacaoService {
 
         InputStream inputStream = this.armazenamentoService.downloadFile(arquivoS3);
         return DownloadArquivoDTO.builder().inputStream(inputStream).contentType(arquivoS3.getTipo()).nomeArquivo(arquivoS3.getArquivoNome()).build();
+    }
+
+    private EnvioEmailEntity emailNovaAtualizacao(ProjetoAtualizacaoEntity projetoAtualizacao) {
+        String corpo = SpringResourceLoader.getResourceFileAsString("static/email-templates/atualizacao-projeto.html")
+                .replace("{{nome_do_projeto}}", projetoAtualizacao.getTitulo())
+                .replace("{{url_atualizacao_projeto}}", String.format("%s/atualizacao?__token_visualizacao_atualizacao=%s",
+                        frontEndUrlBase, projetoAtualizacao.getTokenView()));
+        return this.envioEmailService.enviaEmail(String.format("Atualização do Projeto - %s", projetoAtualizacao.getTitulo()),
+                corpo, projetoAtualizacao.getProjeto().getCliente().getEmail(), projetoAtualizacao);
     }
 
 }

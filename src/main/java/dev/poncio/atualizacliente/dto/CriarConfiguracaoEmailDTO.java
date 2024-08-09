@@ -10,6 +10,7 @@ public class CriarConfiguracaoEmailDTO {
     private Boolean smtpSsl;
     private Boolean smtpTls;
     private Boolean smtpAuth;
+    private String enviarDe;
     private String smtpUser;
     private String smtpPassword;
 

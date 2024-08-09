@@ -5,12 +5,14 @@ import dev.poncio.atualizacliente.dto.CriarProjetoAtualizacaoRequestDTO;
 import dev.poncio.atualizacliente.dto.CriarProjetoRequestDTO;
 import dev.poncio.atualizacliente.dto.DownloadArquivoDTO;
 import dev.poncio.atualizacliente.entities.ClienteEntity;
+import dev.poncio.atualizacliente.entities.EnvioEmailEntity;
 import dev.poncio.atualizacliente.entities.ProjetoAtualizacaoEntity;
 import dev.poncio.atualizacliente.entities.ProjetoEntity;
 import dev.poncio.atualizacliente.excecoes.RegraNegocioException;
 import dev.poncio.atualizacliente.repositories.IProjetoRepository;
 import dev.poncio.atualizacliente.utils.AuthContext;
 import dev.poncio.atualizacliente.utils.ProjetoMapper;
+import dev.poncio.atualizacliente.utils.SpringResourceLoader;
 import jakarta.persistence.EntityNotFoundException;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +39,8 @@ public class ProjetoService {
     private ProjetoAtualizacaoService projetoAtualizacaoService;
     @Autowired
     private ClienteService clienteService;
+    @Autowired
+    private EnvioEmailService envioEmailService;
 
     public ProjetoEntity buscarPeloId(Long id) {
         return this.projetoRepository.findById(id).orElseThrow(EntityNotFoundException::new);
@@ -53,7 +57,9 @@ public class ProjetoService {
         novoProjeto.setCriadoEm(LocalDateTime.now());
         novoProjeto.setCriadoPor(authContext.getUsuarioLogado());
         novoProjeto.setCliente(clienteService.buscarPeloId(criarProjetoRequestDTO.getClienteId()));
-        return this.projetoRepository.save(novoProjeto);
+        ProjetoEntity projetoCriado = this.projetoRepository.save(novoProjeto);
+        this.emailNovoProjeto(projetoCriado);
+        return projetoCriado;
     }
 
     public ProjetoEntity atualizarProjeto(Long id, AtualizaProjetoRequestDTO atualizaProjetoRequestDTO) {
@@ -118,6 +124,13 @@ public class ProjetoService {
     public DownloadArquivoDTO baixaAnexoProjetoAtualizacaoToken(Long projetoId, Long projetoAtualizacaoId, String nomeArquivoUpload, String token) {
         ProjetoEntity projetoSalvo = buscarPeloId(projetoId);
         return this.projetoAtualizacaoService.baixarArquivoToken(projetoSalvo, projetoAtualizacaoId, nomeArquivoUpload, token);
+    }
+
+    private EnvioEmailEntity emailNovoProjeto(ProjetoEntity projeto) {
+        String corpo = SpringResourceLoader.getResourceFileAsString("static/email-templates/criacao-projeto.html")
+                .replace("{{nome_do_projeto}}", projeto.getNome());
+        return this.envioEmailService.enviaEmail(String.format("Novo Projeto - %s", projeto.getNome()),
+                corpo, projeto.getCliente().getEmail(), projeto);
     }
 
 }

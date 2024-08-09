@@ -84,12 +84,17 @@ public class EnvioEmailEntity {
     private Boolean smtpTls;
     @Column(name = "smtp_auth")
     private Boolean smtpAuth;
+    @Column(name = "enviado_de")
+    private String enviadoDe;
     @Column(name = "tipo_email")
     @Enumerated(EnumType.STRING)
     private EnvioEmailTipo tipo;
     @OneToOne
     @JoinColumn(name = "projeto_atualizacao_id")
     private ProjetoAtualizacaoEntity projetoAtualizacao;
+    @OneToOne
+    @JoinColumn(name = "projeto_id")
+    private ProjetoEntity projeto;
     @OneToOne
     @JoinColumn(name = "cliente_id")
     private ClienteEntity cliente;

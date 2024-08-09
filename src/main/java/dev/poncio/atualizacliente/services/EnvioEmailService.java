@@ -1,8 +1,6 @@
 package dev.poncio.atualizacliente.services;
 
-import dev.poncio.atualizacliente.entities.ConfiguracaoEmailEntity;
-import dev.poncio.atualizacliente.entities.EnvioEmailEntity;
-import dev.poncio.atualizacliente.entities.ProjetoAtualizacaoEntity;
+import dev.poncio.atualizacliente.entities.*;
 import dev.poncio.atualizacliente.repositories.IEnvioEmailRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,17 +14,29 @@ public class EnvioEmailService {
     @Autowired
     private IEnvioEmailRepository envioEmailRepository;
 
-    public EnvioEmailEntity registraIntencaoEmail(ProjetoAtualizacaoEntity projetoAtualizacao) {
-        String link = String.format("Veja na aplicação https://localhost:8081/atualizacao?__token_visualizacao_atualizacao=%s", projetoAtualizacao.getTokenView());
-        return this.registraIntencaoEmail(
-                EnvioEmailEntity.builder()
-                        .assunto("Atualização do Projeto - " + projetoAtualizacao.getTitulo())
-                        .corpo(String.format("Cheque na plataforma: %s", link))
-                        .envioSolicitadoEm(LocalDateTime.now())
-                        .emailDestino(projetoAtualizacao.getProjeto().getCliente().getEmail())
-                        .projetoAtualizacao(projetoAtualizacao)
-                        .tipo(EnvioEmailEntity.EnvioEmailTipo.PROJETO_ATUALIZACAO)
-                        .build());
+    public EnvioEmailEntity enviaEmail(String assunto, String corpo, String emailDestino, ProjetoAtualizacaoEntity projetoAtualizacao) {
+        return this.registraIntencaoEmail(this.preparaEnvioEmail(assunto, corpo, emailDestino).projetoAtualizacao(projetoAtualizacao).build());
+    }
+
+    public EnvioEmailEntity enviaEmail(String assunto, String corpo, String emailDestino, ProjetoEntity projeto) {
+        return this.registraIntencaoEmail(this.preparaEnvioEmail(assunto, corpo, emailDestino).projeto(projeto).build());
+    }
+
+    public EnvioEmailEntity enviaEmail(String assunto, String corpo, String emailDestino, ClienteEntity cliente) {
+        return this.registraIntencaoEmail(this.preparaEnvioEmail(assunto, corpo, emailDestino).cliente(cliente).build());
+    }
+
+    public EnvioEmailEntity enviaEmail(String assunto, String corpo, String emailDestino, UsuarioEntity usuario) {
+        return this.registraIntencaoEmail(this.preparaEnvioEmail(assunto, corpo, emailDestino).usuario(usuario).build());
+    }
+
+    private EnvioEmailEntity.EnvioEmailEntityBuilder preparaEnvioEmail(String assunto, String corpo, String emailDestino) {
+        return EnvioEmailEntity.builder()
+                .assunto(assunto)
+                .corpo(corpo)
+                .envioSolicitadoEm(LocalDateTime.now())
+                .emailDestino(emailDestino)
+                .tipo(EnvioEmailEntity.EnvioEmailTipo.PROJETO_ATUALIZACAO);
     }
 
     private EnvioEmailEntity registraIntencaoEmail(EnvioEmailEntity projetoAtualizacaoEmail) {
@@ -57,6 +67,7 @@ public class EnvioEmailService {
         envioEmail.setSmtpPort(configuracaoEmail.getSmtpPort());
         envioEmail.setSmtpAuth(configuracaoEmail.getSmtpAuth());
         envioEmail.setSmtpSsl(configuracaoEmail.getSmtpSsl());
+        envioEmail.setEnviadoDe(configuracaoEmail.getEnviarDe());
     }
 
     public List<EnvioEmailEntity> ultimosEmailsProcessados() {

@@ -1,4 +1,3 @@
---drop table usuario;
 create table usuario (
 	id serial primary key,
 	nome text not null,
@@ -10,10 +9,7 @@ create table usuario (
 	validado_em timestamp(6) null default CURRENT_TIMESTAMP,
 	criado_por_id bigint null references usuario(id)
 );
-insert into usuario(nome, email, senha, validado, criado_em, validado_em)
-values('Ricardo', 'ricardo.poncio@outlook.com.br', '123', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
---drop table cliente;
 create table cliente (
 	id serial primary key,
 	razao_social text not null,
@@ -28,12 +24,7 @@ create table cliente (
 	validado_em timestamp(6) null,
 	criado_por_id bigint null references usuario(id)
 );
-insert into cliente(razao_social, cnpj, email, validado, criado_por_id)
-values('Teste Razao', '00000000000101', 'teste@teste.com', true, 1);
 
---drop table projeto;
--- Status: A Aberto, C Concluido
--- Estado: F Na Fila, B Bloqueado, A Em Andamento, R Em Revisão, P Aguardando Pagamento, G Finalizado
 create table projeto (
 	id serial primary key,
 	nome text not null,
@@ -46,11 +37,7 @@ create table projeto (
 	criado_por_id bigint not null references usuario(id),
 	cliente_id bigint not null references cliente(id)
 );
-insert into projeto(nome, descricao, valor, data_limite, criado_por_id, cliente_id)
-values('Projeto 1', 'Projeto Desc', 100, '2024-11-30 23:59:59', 1, 1);
 
---drop table projeto_atualizacao_email;
---drop table projeto_atualizacao;
 create table projeto_atualizacao (
 	id serial primary key,
 	titulo text not null,
@@ -63,7 +50,6 @@ create table projeto_atualizacao (
 	projeto_id bigint not null references projeto(id)
 );
 
---drop table configuracao_email;
 create table configuracao_email (
 	id serial primary key,
 	smtp_host text not null,
@@ -73,15 +59,12 @@ create table configuracao_email (
 	smtp_auth boolean not null,
 	smtp_user text null,
 	smtp_password text null,
+	enviar_de text not null,
 	criado_em timestamp(6) not null default current_timestamp,
 	criado_por_id bigint not null references usuario(id),
 	ultimo_uso_sucesso timestamp(6) null
 );
 
--- Resultado: S Enviado com Sucesso, F Falha no envio
--- Tipo: CLIENTE_VALIDACAO, CLIENTE_RESET_SENHA, USUARIO_VALIDACAO, USUARIO_RESET_SENHA,
---			PROJETO_ATUALIZACAO, PROJETO_CRIACAO
---drop table envio_email;
 create table envio_email (
 	id serial primary key,
 	email_destino text not null,
@@ -96,14 +79,15 @@ create table envio_email (
 	smtp_ssl boolean null,
 	smtp_tls boolean null,
 	smtp_auth boolean null,
+	enviado_de text null,
 	tipo_email text not null,
+	projeto_id bigint null references projeto(id),
 	projeto_atualizacao_id bigint null references projeto_atualizacao(id),
 	cliente_id bigint null references cliente(id),
 	usuario_id bigint null references usuario(id),
-	configuracao_email_id bigint null references configuracao_email(id)
+	configuracao_email_id bigint null
 );
 
--- drop table configuracao_armazenamento_s3;
 create table configuracao_armazenamento_s3 (
 	id serial primary key,
 	s3_service_endpoint text not null,
@@ -115,4 +99,24 @@ create table configuracao_armazenamento_s3 (
 	criado_em timestamp(6) not null default current_timestamp,
 	criado_por_id bigint not null references usuario(id),
 	ultimo_uso_sucesso timestamp(6) null
+);
+
+create table arquivo_s3 (
+	id serial primary key,
+	arquivo_nome text not null,
+	arquivo_nome_upload text not null,
+	arquivo_caminho_completo text not null,
+	nome_bucket text not null,
+	tamanho bigint not null,
+	tipo text not null,
+	url_completa text not null,
+	criado_em timestamp(6) not null default current_timestamp,
+	criado_por_id bigint not null references usuario(id),
+	configuracao_s3_id bigint null
+);
+
+create table projeto_atualizacao_anexo (
+	id serial primary key,
+	projeto_atualizacao_id bigint not null references projeto_atualizacao(id),
+	arquivo_s3_id bigint not null references arquivo_s3(id)
 );

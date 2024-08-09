@@ -9,6 +9,7 @@ public class EnvioEmailDTO extends EnvioEmailSimplificadoDTO {
 
     private String assunto;
     private String corpo;
+    private String enviadoDe;
     private ProjetoAtualizacaoDTO projetoAtualizacao;
     private ClienteSemUsuarioDTO cliente;
     private UsuarioBasicoDTO usuario;

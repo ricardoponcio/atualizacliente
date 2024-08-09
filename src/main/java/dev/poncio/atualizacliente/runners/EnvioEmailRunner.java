@@ -16,7 +16,7 @@ public class EnvioEmailRunner {
 
     public void enviarEmailAtualizacaoProjeto(ConfiguracaoEmailEntity configuracao, EnvioEmailEntity envioEmail) {
         SimpleMailMessage message = new SimpleMailMessage();
-        message.setFrom("noreply@attcliente.poncio.dev");
+        message.setFrom(configuracao.getEnviarDe());
         message.setTo(envioEmail.getEmailDestino());
         message.setSubject(envioEmail.getAssunto());
         message.setText(envioEmail.getCorpo());

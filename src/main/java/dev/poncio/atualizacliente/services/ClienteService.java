@@ -3,14 +3,17 @@ package dev.poncio.atualizacliente.services;
 import dev.poncio.atualizacliente.dto.AtualizarClienteRequestDTO;
 import dev.poncio.atualizacliente.dto.CriarClienteRequestDTO;
 import dev.poncio.atualizacliente.entities.ClienteEntity;
+import dev.poncio.atualizacliente.entities.EnvioEmailEntity;
 import dev.poncio.atualizacliente.excecoes.RegraNegocioException;
 import dev.poncio.atualizacliente.repositories.IClienteRepository;
 import dev.poncio.atualizacliente.utils.AuthContext;
 import dev.poncio.atualizacliente.utils.ClienteMapper;
+import dev.poncio.atualizacliente.utils.SpringResourceLoader;
 import jakarta.persistence.EntityNotFoundException;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +24,9 @@ import java.util.UUID;
 
 @Service
 public class ClienteService {
+
+    @Value("${frontend.url.base:}")
+    private String frontEndUrlBase;
 
     @Autowired
     private IClienteRepository clienteRepository;
@@ -33,6 +39,8 @@ public class ClienteService {
     private AuthContext authContext;
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
+    @Autowired
+    private EnvioEmailService envioEmailService;
 
     public ClienteEntity buscarPeloId(Long id) {
         return this.clienteRepository.findById(id).orElseThrow(EntityNotFoundException::new);
@@ -58,7 +66,9 @@ public class ClienteService {
         clienteNovo.setAtivo(true);
         clienteNovo.setCriadoPor(authContext.getUsuarioLogado());
         clienteNovo.setTokenValidacao(UUID.randomUUID().toString());
-        return this.clienteRepository.save(clienteNovo);
+        ClienteEntity clienteCriado = this.clienteRepository.save(clienteNovo);
+        this.emailValidaCliente(clienteCriado);
+        return clienteCriado;
     }
 
     public ClienteEntity validarCliente(String tokenValidacao, String novaSenhaCliente) throws RegraNegocioException {
@@ -90,6 +100,22 @@ public class ClienteService {
             throw new EntityNotFoundException();
 
         this.clienteRepository.deleteById(id);
+    }
+
+    private EnvioEmailEntity emailValidaCliente(ClienteEntity cliente) {
+        String corpo = SpringResourceLoader.getResourceFileAsString("static/email-templates/validar-email-cliente.html")
+                .replace("{{url_atualizacao_projeto}}", String.format("%s/validar?__token_validacao_cliente=%s",
+                        frontEndUrlBase, cliente.getTokenValidacao()));
+        return this.envioEmailService.enviaEmail("Validar Email",
+                corpo, cliente.getEmail(), cliente);
+    }
+
+    private EnvioEmailEntity emailResetSenhaCliente(ClienteEntity cliente) {
+        String corpo = SpringResourceLoader.getResourceFileAsString("static/email-templates/troca-senha-cliente.html")
+                .replace("{{url_troca_senha_cliente}}", String.format("%s/troca-senha-cliente?__token_senha_cliente=%s",
+                        frontEndUrlBase, null));
+        return this.envioEmailService.enviaEmail("Alteração de Senha",
+                corpo, cliente.getEmail(), cliente);
     }
 
 }
