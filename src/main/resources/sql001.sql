@@ -81,10 +81,10 @@ create table envio_email (
 	smtp_auth boolean null,
 	enviado_de text null,
 	tipo_email text not null,
-	projeto_id bigint null references projeto(id),
-	projeto_atualizacao_id bigint null references projeto_atualizacao(id),
-	cliente_id bigint null references cliente(id),
-	usuario_id bigint null references usuario(id),
+	projeto_id bigint null,
+	projeto_atualizacao_id bigint null,
+	cliente_id bigint null,
+	usuario_id bigint null,
 	configuracao_email_id bigint null
 );
 
