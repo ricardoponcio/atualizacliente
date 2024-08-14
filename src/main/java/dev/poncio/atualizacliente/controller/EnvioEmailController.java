@@ -2,6 +2,7 @@ package dev.poncio.atualizacliente.controller;
 
 import dev.poncio.atualizacliente.dto.EnvioEmailCompletoDTO;
 import dev.poncio.atualizacliente.dto.EnvioEmailDTO;
+import dev.poncio.atualizacliente.dto.EnvioEmailStatusDTO;
 import dev.poncio.atualizacliente.services.EnvioEmailService;
 import dev.poncio.atualizacliente.utils.EnvioEmailMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +26,11 @@ public class EnvioEmailController {
     @GetMapping("/ultimos")
     public List<EnvioEmailCompletoDTO> ultimosEnvios() {
         return this.envioEmailService.ultimosEmailsProcessados().stream().map(envioEmailMapper::map).collect(Collectors.toList());
+    }
+
+    @GetMapping("/status")
+    public EnvioEmailStatusDTO status() {
+        return this.envioEmailService.statusEnvios();
     }
 
 }

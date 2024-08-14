@@ -1,5 +1,6 @@
 package dev.poncio.atualizacliente.services;
 
+import dev.poncio.atualizacliente.dto.EnvioEmailStatusDTO;
 import dev.poncio.atualizacliente.entities.*;
 import dev.poncio.atualizacliente.repositories.IEnvioEmailRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class EnvioEmailService {
@@ -72,6 +74,17 @@ public class EnvioEmailService {
 
     public List<EnvioEmailEntity> ultimosEmailsProcessados() {
         return this.envioEmailRepository.findTop10ByEnvioProcessadoEmIsNotNullOrderByIdDesc();
+    }
+
+    public EnvioEmailStatusDTO statusEnvios() {
+        Optional<EnvioEmailEntity> ultimoEnvio = this.envioEmailRepository.findTopByEnvioProcessadoEmIsNotNullOrderByIdDesc();
+        Optional<EnvioEmailEntity> ultimoSucesso = this.envioEmailRepository.findTopByResultadoAndEnvioProcessadoEmIsNotNullOrderByIdDesc(EnvioEmailEntity.EnvioEmailResultado.ENVIADO_SUCESSO);
+
+        return EnvioEmailStatusDTO.builder()
+                .funcionando(ultimoEnvio.map(envio -> envio.getResultado() == EnvioEmailEntity.EnvioEmailResultado.ENVIADO_SUCESSO).orElse(true))
+                .ultimaUtilizacao(ultimoEnvio.map(EnvioEmailEntity::getEnvioProcessadoEm).orElse(null))
+                .ultimaUtilizacaoSucesso(ultimoSucesso.map(EnvioEmailEntity::getEnvioProcessadoEm).orElse(null))
+                .build();
     }
 
 }

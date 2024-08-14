@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface IEnvioEmailRepository extends JpaRepository<EnvioEmailEntity, Long> {
@@ -12,5 +13,9 @@ public interface IEnvioEmailRepository extends JpaRepository<EnvioEmailEntity, L
     List<EnvioEmailEntity> findAllByEnvioProcessadoEmIsNull();
 
     List<EnvioEmailEntity> findTop10ByEnvioProcessadoEmIsNotNullOrderByIdDesc();
+
+    Optional<EnvioEmailEntity> findTopByResultadoAndEnvioProcessadoEmIsNotNullOrderByIdDesc(EnvioEmailEntity.EnvioEmailResultado resultado);
+
+    Optional<EnvioEmailEntity> findTopByEnvioProcessadoEmIsNotNullOrderByIdDesc();
 
 }

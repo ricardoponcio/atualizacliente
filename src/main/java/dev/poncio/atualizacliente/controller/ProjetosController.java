@@ -1,6 +1,8 @@
 package dev.poncio.atualizacliente.controller;
 
+import dev.poncio.atualizacliente.domain.ProjetoFiltro;
 import dev.poncio.atualizacliente.dto.*;
+import dev.poncio.atualizacliente.entities.ProjetoEntity;
 import dev.poncio.atualizacliente.excecoes.RegraNegocioException;
 import dev.poncio.atualizacliente.services.ProjetoService;
 import dev.poncio.atualizacliente.utils.ProjetoAtualizacaoMapper;
@@ -30,8 +32,18 @@ public class ProjetosController {
     private ProjetoService projetoService;
 
     @GetMapping("/listar")
-    public List<ProjetoDTO> listarProjetos() {
-        return this.projetoService.listarProjetos().stream().map(projetoMapper::map).collect(Collectors.toList());
+    public List<ProjetoDTO> listarProjetos(@RequestParam(required = false) ProjetoEntity.ProjetoStatus status, @RequestParam(required = false) ProjetoEntity.ProjetoSubStatus subStatus) {
+        return this.projetoService.listarProjetos(
+                        ProjetoFiltro.builder()
+                                .status(status)
+                                .subStatus(subStatus)
+                                .build())
+                .stream().map(projetoMapper::map).collect(Collectors.toList());
+    }
+
+    @GetMapping("/estatisticas")
+    public ProjetosEstatisticasDTO retornarEstatisticas() {
+        return this.projetoService.retornarEstatisticas();
     }
 
     @GetMapping("/{id}/detalhe")

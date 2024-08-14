@@ -1,9 +1,7 @@
 package dev.poncio.atualizacliente.services;
 
-import dev.poncio.atualizacliente.dto.AtualizaProjetoRequestDTO;
-import dev.poncio.atualizacliente.dto.CriarProjetoAtualizacaoRequestDTO;
-import dev.poncio.atualizacliente.dto.CriarProjetoRequestDTO;
-import dev.poncio.atualizacliente.dto.DownloadArquivoDTO;
+import dev.poncio.atualizacliente.domain.ProjetoFiltro;
+import dev.poncio.atualizacliente.dto.*;
 import dev.poncio.atualizacliente.entities.ClienteEntity;
 import dev.poncio.atualizacliente.entities.EnvioEmailEntity;
 import dev.poncio.atualizacliente.entities.ProjetoAtualizacaoEntity;
@@ -13,7 +11,9 @@ import dev.poncio.atualizacliente.repositories.IProjetoRepository;
 import dev.poncio.atualizacliente.utils.AuthContext;
 import dev.poncio.atualizacliente.utils.ProjetoMapper;
 import dev.poncio.atualizacliente.utils.SpringResourceLoader;
+import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.persistence.Query;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -42,12 +42,25 @@ public class ProjetoService {
     @Autowired
     private EnvioEmailService envioEmailService;
 
+    @Autowired
+    EntityManager entityManager;
+
     public ProjetoEntity buscarPeloId(Long id) {
         return this.projetoRepository.findById(id).orElseThrow(EntityNotFoundException::new);
     }
 
-    public List<ProjetoEntity> listarProjetos() {
-        return this.projetoRepository.findAll();
+    public List<ProjetoEntity> listarProjetos(ProjetoFiltro filtro) {
+        StringBuilder querybuilder = new StringBuilder("select p from ProjetoEntity p where 1=1");
+        if (filtro.getStatus() != null)
+            querybuilder.append(" and p.status = :status");
+        if (filtro.getSubStatus() != null)
+            querybuilder.append(" and p.subStatus = :subStatus");
+        Query query = entityManager.createQuery(querybuilder.toString());
+        if (filtro.getStatus() != null)
+            query.setParameter("status", filtro.getStatus());
+        if (filtro.getSubStatus() != null)
+            query.setParameter("subStatus", filtro.getSubStatus());
+        return (List<ProjetoEntity>) query.getResultList();
     }
 
     public ProjetoEntity inserirProjeto(CriarProjetoRequestDTO criarProjetoRequestDTO) {
@@ -131,6 +144,18 @@ public class ProjetoService {
                 .replace("{{nome_do_projeto}}", projeto.getNome());
         return this.envioEmailService.enviaEmail(String.format("Novo Projeto - %s", projeto.getNome()),
                 corpo, projeto.getCliente().getEmail(), projeto);
+    }
+
+    public ProjetosEstatisticasDTO retornarEstatisticas() {
+        List<ProjetoEntity> proximosProjetosVencer = this.projetoRepository.findTop10ByStatusOrderByDataLimiteDesc(ProjetoEntity.ProjetoStatus.ABERTO);
+        Integer projetosAbertos = this.projetoRepository.countDistinctIdByStatus(ProjetoEntity.ProjetoStatus.ABERTO);
+        Integer projetosAguardandoPagamento = this.projetoRepository.countDistinctIdByStatusAndSubStatus(ProjetoEntity.ProjetoStatus.ABERTO, ProjetoEntity.ProjetoSubStatus.AGUARDANDO_PAGAMENTO);
+
+        return ProjetosEstatisticasDTO.builder()
+                .proximosProjetosVencer(proximosProjetosVencer.stream().map(this.projetoMapper::map).toList())
+                .projetosAbertos(projetosAbertos)
+                .projetosAguardandoPagamento(projetosAguardandoPagamento)
+                .build();
     }
 
 }
