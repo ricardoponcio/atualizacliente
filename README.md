@@ -1,152 +1,158 @@
 # Atualiza Cliente
 
-Essa é uma plataforma opensource para registro de clientes e projetos, bem como suas atualizações ao longo do tempo e notificação dos clientes por e-mail.  
+This is an open-source platform for registering clients and projects, tracking their updates over time, and notifying clients by email.
 
-A implementação conta somente com o MVP do produto, não contemplando todas as validações e funcionalidades que podem existir, mas que permite forks do projeto para continuidade e implementação self-hosted.  
+The implementation currently provides only the MVP of the product, not covering all possible validations and features, but allowing forks for further development and self-hosted deployments.
 
-Apesar de existir endpoint para cadastro de usuários, o sistema não tem suporte visual a mais de um usuário, porém o banco de dados está preparado para isto. Além disso, o sistema foi pensado para solucionar o problema de um contexto somente, não permitindo várias empresas/pessoas lidando cada uma com seus clientes/projetos isoladamente como soluções SAAS disponíveis no mercado.
+Although there is an endpoint for user registration, the system does not visually support more than one user, but the database is prepared for this. The system is designed for a single context and does not support multiple companies/people managing their own clients/projects in isolation, unlike SaaS solutions.
 
-## Tencologia da Solução
+## Solution Technology
 
-O backend da solução foi escrito em Java 17 com framework Spring Boot, e teve suas entidades modeladas para utilização de banco PostgreSQL, como não conta com nenhuma consulta nativa, para utilizar outro banco de dados basta migrar o script de inicialização.  
-[Backend](https://github.com/ricardoponcio/atualizacliente-api)
+- **Backend:** Written in Java 17 with Spring Boot, using PostgreSQL by default. No native queries are used, so switching to another relational database only requires migrating the initialization script.  
+  See [`atualizacliente-api`](./atualizacliente-api/README.md) for backend details.
 
-O frontend foi produzido com a biblioteca React.JS, sem uso de frameworks mais complexos.
-[Frontend](https://github.com/ricardoponcio/atualizacliente-front)
+- **Frontend:** Built with React.js, without complex frameworks.  
+  See [`atualizacliente-front`](./atualizacliente-front/README.md) for frontend details.
 
-A solução foi projetada para ser implementada da seguinte forma:
-![Diagrama](images/Diagrama.png)
+The recommended deployment is to point your DNS A record to an NGINX server with a public IP, which routes HTTPS requests (with SSL engine + Certbot) to backend/frontend servers over HTTP. Using a VPN is also recommended for logical resource separation and security, especially to keep the database off the public IP machine.
 
-A recomendação seria o apontamento do DNS como registro A para um NGINX em uma máquina com IP quente, que faria o roteamento das requisições HTTPS com SSL engine + SSL Certbot para servidores que possuem o backend/frontend utilizando o protocolo HTTP. Também é recomendado uso de VPN para separação lógica dos recursos e dar mais segurança, removendo principalmente o banco de dados da máquina com ip quente.
+![Diagram](images/Diagrama.png)
 
-## Recursos disponíveis
+## Available Features
 
-### 1. Setup do Usuário
+### 1. User Setup
 
-![Setup do projeto](images/usuario/setup_usuario.png)
+![User setup](images/usuario/setup_usuario.png)
 
-Cadastro do usuário ao iniciar o sistema em um banco novo.
+Register the first user when starting the system with a new database.
 
 ### 2. Login
 
 ![Login](images/usuario/login.png)
 
-Permite autenticar na plataforma utilizando as credenciais configuradas anteriormente no passo um.
+Authenticate using the credentials configured in the setup step.
 
-### 3. Tela Inicial
+### 3. Home Screen
 
 ![Home](images/home.png)
 
-Visualização das métricas dos projetos e primeiros dez projetos a vencer na sequência.
+View project metrics and the next ten upcoming projects.
 
-### 4. Configuração de E-mail
+### 4. Email Configuration
 
-Recurso necessário para os avisos aos clientes.
+Required for client notifications.
 
-*Por segurança, não é possível atualizar uma configuração (para evitar exposição das credenciais), portanto para atualizar basta remover o registro utilizando a ação correta e criar um novo.*
+*For security, configurations cannot be updated (to avoid exposing credentials). To update, remove the record and create a new one.*
 
-#### 4.1 Listagem das configurações
+#### 4.1 List Configurations
 
-![Lista de configurações de Email](images/config_email/lista_config_email.png)
+![Email config list](images/config_email/lista_config_email.png)
 
-*Atualmente o sistema só permite cadastro de uma configuração para facilitar a seleção da configuração na hora de emitir os avisos*
+*Only one configuration is allowed to simplify selection when sending notifications.*
 
-#### 4.2 Criação de nova configuração
+#### 4.2 Create New Configuration
 
-![Criar configurações de Email](images/config_email/nova_config_email.png)
+![Create email config](images/config_email/nova_config_email.png)
 
-#### 4.2 Listagem de emails enviados
+#### 4.3 List Sent Emails
 
-![Envios de email](images/config_email/lista_envios_email.png)
+![Sent emails](images/config_email/lista_envios_email.png)
 
-*Permite analisar erros na configuração do servidor de SMTP*
+*Allows analysis of SMTP server errors.*
 
-### 5. Configuração de Armazenamento
+### 5. Storage Configuration
 
-Recurso necessário para salvar os anexos, utiliza protocolo de armazenamento S3.
+Required for saving attachments, uses S3-compatible storage.
 
-*Por segurança, não é possível atualizar uma configuração (para evitar exposição das credenciais), portanto para atualizar basta remover o registro utilizando a ação correta e criar um novo.*
+*For security, configurations cannot be updated. To update, remove and create a new one.*
 
-#### 5.1 Listagem das configurações
+#### 5.1 List Configurations
 
-![Lista de configurações de Armazenamento](images/config_s3/lista_config_s3.png)
+![Storage config list](images/config_s3/lista_config_s3.png)
 
-*Atualmente o sistema só permite cadastro de uma configuração para facilitar a seleção da configuração na hora de anexar os documentos*
+*Only one configuration is allowed to simplify document attachment.*
 
-#### 5.2 Criação de nova configuração
+#### 5.2 Create New Configuration
 
-![Criar configurações de Armazenamento](images/config_s3/nova_config_s3.png)
+![Create storage config](images/config_s3/nova_config_s3.png)
 
-### 6. Clientes
+### 6. Clients
 
-#### 6.1 Listagem dos clientes
+#### 6.1 List Clients
 
-![Lista de clientes cadastrados](images/clientes/lista_clientes.png)
+![Client list](images/clientes/lista_clientes.png)
 
-#### 6.2 Criação de um novo registro
+#### 6.2 Create New Client
 
-![Criar registro de cliente](images/clientes/novo_cliente.png)
+![Create client](images/clientes/novo_cliente.png)
 
-#### 6.3 Modificar um registro
+#### 6.3 Edit Client
 
-![Modificar registro de cliente](images/clientes/modifica_cliente.png)
+![Edit client](images/clientes/modifica_cliente.png)
 
-#### 6.4 Validação do registro
+#### 6.4 Validate Client
 
-![Validação do cliente](images/clientes/validar_cliente.png)
+![Validate client](images/clientes/validar_cliente.png)
 
-*Ao ser cadastrado, o cliente recebe um e-mail com um link que leva a esta tela, nela ele deve criar uma senha de segurança para visualizar as atualizações e evitar vazamento dos dados*
+*When registered, the client receives an email with a link to this screen, where they must set a security password to view updates and prevent data leaks.*
 
-#### 6.5 Remover um registro
+#### 6.5 Remove Client
 
-![Remover registro de cliente](images/clientes/remove_cliente.png)
+![Remove client](images/clientes/remove_cliente.png)
 
-### 7. Projetos
+### 7. Projects
 
-#### 7.1 Listagem dos projetos
+#### 7.1 List Projects
 
-![Lista de projetos cadastrados](images/projetos/lista_projetos.png)
+![Project list](images/projetos/lista_projetos.png)
 
-#### 7.2 Criação de um novo registro
+#### 7.2 Create New Project
 
-![Criar projeto de cliente](images/projetos/novo_projeto.png)
+![Create project](images/projetos/novo_projeto.png)
 
-#### 7.3 Modificar um registro
+#### 7.3 Edit Project
 
-![Modificar registro de projeto](images/projetos/modifica_projeto.png)
+![Edit project](images/projetos/modifica_projeto.png)
 
-*Modificar um projeto não emite atualização ao cliente, pois esse é um registro administrativo feito para auxiliar o usuário na organização.*
+*Editing a project does not notify the client; this is an administrative action to help organize.*
 
-#### 7.4 Remover um registro
+#### 7.4 Remove Project
 
-![Remover registro de projeto](images/projetos/remove_projeto.png)
+![Remove project](images/projetos/remove_projeto.png)
 
-#### 7.5 Detalhar um Projeto
+#### 7.5 Project Details
 
-![Detalhes do Projeto](images/projetos/detalhe_projeto.png)
+![Project details](images/projetos/detalhe_projeto.png)
 
-#### 7.6 Atualizações de Projeto
+#### 7.6 Project Updates
 
-##### 7.6.1 Listagem dos projetos
+##### 7.6.1 List Updates
 
-A listagem pode ser feita ao detalhar um projeto, como mostrado no item 7.5.
+Updates can be listed by viewing project details (see 7.5).
 
-##### 7.6.2 Emitir nova atualização
+##### 7.6.2 Create New Update
 
-![Emissão de nova atualização](images/projetos/atualizacao/nova_atualizacao_projeto.png)
+![Create update](images/projetos/atualizacao/nova_atualizacao_projeto.png)
 
-*A atualização inicia com os mesmos status/substatus do projeto no momento, e alterar estes valores ao emitir uma atualização, altera também os valores do projeto que está recebendo a atualização*
+*The update starts with the current project status/substatus. Changing these values when creating an update also updates the project itself.*
 
-*Neste momento, ao salvar a atualização (descrição e anexos), será comunicado ao cliente de forma irreversível*
+*When saving an update (description and attachments), the client is notified irreversibly.*
 
-##### 7.6.4 Detalhar uma atualização emitida
+##### 7.6.4 View Update Details
 
-![Detalhar uma atualização](images/projetos/atualizacao/detalhe_projeto_atualizacao.png)
+![Update details](images/projetos/atualizacao/detalhe_projeto_atualizacao.png)
 
-##### 7.6.5 Consulta pública da atualização
+##### 7.6.5 Public Update Consultation
 
-![Consulta pública de uma atualização](images/projetos/atualizacao/atualizacao_publica_consulta.png)
+![Public update consultation](images/projetos/atualizacao/atualizacao_publica_consulta.png)
 
-*Tela será carregada ao abrir o link que será enviado para o usuário, será necessário informar a senha de segurança do cliente que foi cadastrado na validação para visualizar os dados*
+*This screen is loaded from a link sent to the user. The client must enter their security password to view the update.*
 
-![Resultado da consulta pública de uma atualização](images/projetos/atualizacao/atualizacao_publica_resultado.png)
+![Public update result](images/projetos/atualizacao/atualizacao_publica_resultado.png)
+
+---
+
+## Submodules
+
+- [`atualizacliente-api`](./atualizacliente-api/README.md): Backend API (Java/Spring Boot)
+- [`atualizacliente-front`](./atualizacliente-front/README.md): Frontend (React.js)

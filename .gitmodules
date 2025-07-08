@@ -1,0 +1,6 @@
+[submodule "atualizacliente-api"]
+	path = atualizacliente-api
+	url = git@github.com:ricardoponcio/atualizacliente-api.git
+[submodule "atualizacliente-front"]
+	path = atualizacliente-front
+	url = git@github.com:ricardoponcio/atualizacliente-front.git
