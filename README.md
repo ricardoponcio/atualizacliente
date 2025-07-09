@@ -9,10 +9,10 @@ Although there is an endpoint for user registration, the system does not visuall
 ## Solution Technology
 
 - **Backend:** Written in Java 17 with Spring Boot, using PostgreSQL by default. No native queries are used, so switching to another relational database only requires migrating the initialization script.  
-  See [`atualizacliente-api`](./atualizacliente-api/README.md) for backend details.
+  See [`atualizacliente-api`](https://github.com/ricardoponcio/atualizacliente-api) for backend details.
 
 - **Frontend:** Built with React.js, without complex frameworks.  
-  See [`atualizacliente-front`](./atualizacliente-front/README.md) for frontend details.
+  See [`atualizacliente-front`](https://github.com/ricardoponcio/atualizacliente-front) for frontend details.
 
 The recommended deployment is to point your DNS A record to an NGINX server with a public IP, which routes HTTPS requests (with SSL engine + Certbot) to backend/frontend servers over HTTP. Using a VPN is also recommended for logical resource separation and security, especially to keep the database off the public IP machine.
 
@@ -154,5 +154,5 @@ Updates can be listed by viewing project details (see 7.5).
 
 ## Submodules
 
-- [`atualizacliente-api`](./atualizacliente-api/README.md): Backend API (Java/Spring Boot)
-- [`atualizacliente-front`](./atualizacliente-front/README.md): Frontend (React.js)
+- [`atualizacliente-api`](https://github.com/ricardoponcio/atualizacliente-api): Backend API (Java/Spring Boot)
+- [`atualizacliente-front`](https://github.com/ricardoponcio/atualizacliente-front): Frontend (React.js)
